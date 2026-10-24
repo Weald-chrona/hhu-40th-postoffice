@@ -1,0 +1,239 @@
+/* ============================================================
+   响应式适配
+   所有 @media 查询集中在这里，最后加载。
+   你自己板块要做移动端适配，也写在这里对应的注释块里。
+   ============================================================ */
+
+/* ---------- 17. 响应式 ---------- */
+@media (max-width: 1024px) {
+  .hero-title {
+    letter-spacing: 0.06em;
+  }
+
+  .about-intro,
+  .contact {
+    gap: 48px;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav-links {
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 16px 24px 28px;
+    background: rgba(4, 16, 30, 0.97);
+    backdrop-filter: blur(16px);
+    opacity: 0;
+    transform: translateY(-14px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .nav-links.is-open {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .nav-links a {
+    padding: 14px 12px;
+    border-radius: 10px;
+  }
+
+  .nav-links a::after {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: flex;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px 0;
+    padding: 30px 12px;
+  }
+
+  .stat:nth-child(2) {
+    border-right: none;
+  }
+
+  .stat:nth-child(odd) {
+    border-right: 1px solid var(--line);
+  }
+
+  .stat:nth-child(1),
+  .stat:nth-child(2) {
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stat:nth-child(3),
+  .stat:nth-child(4) {
+    padding-top: 22px;
+  }
+
+  .timeline::before {
+    left: 17px;
+  }
+
+  .timeline-item,
+  .timeline-item:nth-child(even) {
+    width: 100%;
+    margin-left: 0;
+    padding-left: 52px;
+    padding-right: 0;
+  }
+
+  .timeline-dot,
+  .timeline-item:nth-child(even) .timeline-dot {
+    left: 8px;
+    right: auto;
+  }
+
+  .about-intro,
+  .contact {
+    grid-template-columns: 1fr;
+  }
+
+  .about-figure figcaption {
+    text-align: left;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .section {
+    padding: 80px 0;
+  }
+
+  .section-head {
+    margin-bottom: 48px;
+  }
+
+  .quote {
+    padding: 88px 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    width: min(100% - 32px, var(--maxw));
+  }
+
+  .brand-text {
+    font-size: 14px;
+  }
+
+  .brand-text small {
+    letter-spacing: 0.14em;
+  }
+
+  .hero {
+    padding-bottom: 96px;
+  }
+
+  .hero-title {
+    letter-spacing: 0.04em;
+  }
+
+  .hero-actions {
+    margin-top: 32px;
+  }
+
+  .btn {
+    padding: 13px 26px;
+    font-size: 14px;
+  }
+
+  .scroll-hint {
+    display: none;
+  }
+
+  .stats {
+    margin-top: -46px;
+  }
+
+  .slide-body {
+    padding: 70px 24px 64px;
+  }
+
+  .carousel-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 24px;
+  }
+
+  .carousel-btn--prev { left: 12px; }
+  .carousel-btn--next { right: 12px; }
+
+  .carousel-dots {
+    left: 24px;
+    bottom: 22px;
+  }
+
+  .milestone {
+    gap: 18px;
+    padding: 22px 4px;
+  }
+
+  .milestone-year {
+    flex: 0 0 72px;
+    font-size: 22px;
+  }
+
+  .to-top {
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+/* 尊重用户的“减少动态效果”设置 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+/* ---------- 22. 新增元素响应式 ---------- */
+@media (max-width: 900px) {
+  .blessing-wall {
+    column-count: 2;
+  }
+
+  .stats-inline {
+    margin-bottom: 44px;
+  }
+}
+
+@media (max-width: 560px) {
+  .blessing-wall {
+    column-count: 1;
+  }
+
+  .alumni-card {
+    padding: 22px;
+    gap: 16px;
+  }
+}

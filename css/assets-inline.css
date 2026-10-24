@@ -1,0 +1,17 @@
+/* ============================================================
+   内联资源区（请勿编辑）
+   这里放的是转成 base64 内嵌的大图，一行就有几百 KB。
+   单独拎出来是为了不让它们拖慢其他 CSS 文件的编辑体验，
+   正常改样式不需要动这个文件。
+   ============================================================ */
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url("../images/hero-gate.jpg");
+  background-position: center 62%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: scale(1.14) translateY(-5%);
+  z-index: -3;
+}

@@ -1,0 +1,72 @@
+/* ============================================================
+   四十号邮局 样式
+   负责：邮局（留言墙）板块的同学。
+   ============================================================ */
+
+/* ---------- 20. 祝福留言墙 ---------- */
+.blessing-wall {
+  column-count: 3;
+  column-gap: 22px;
+}
+
+.blessing-card {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  margin-bottom: 22px;
+  padding: 26px 24px;
+  border-radius: 14px;
+  background: var(--white);
+  border: 1px solid rgba(11, 59, 111, 0.08);
+  box-shadow: 0 14px 30px -24px rgba(6, 27, 51, 0.7);
+  rotate: var(--tilt, 0deg);
+  transition: rotate 0.35s ease, translate 0.35s ease, box-shadow 0.35s ease;
+}
+
+.blessing-card:nth-child(3n + 1) {
+  --tilt: -1.1deg;
+  background: #fffaf0;
+}
+
+.blessing-card:nth-child(3n + 2) {
+  --tilt: 0.9deg;
+  background: #f3f8fe;
+}
+
+.blessing-card:nth-child(3n) {
+  --tilt: -0.6deg;
+  background: #fdf4f6;
+}
+
+.blessing-card:hover {
+  rotate: 0deg;
+  translate: 0 -4px;
+  box-shadow: 0 22px 42px -26px rgba(6, 27, 51, 0.6);
+}
+
+.blessing-text {
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ink);
+}
+
+.blessing-from {
+  margin-top: 16px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-align: right;
+}
+
+.blessing-note {
+  margin-top: 44px;
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+
+/* ---------- 24. 留言墙：卡片留空待填 ---------- */
+.blessing-card {
+  min-height: 96px;
+}

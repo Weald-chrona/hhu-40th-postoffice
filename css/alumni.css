@@ -1,0 +1,112 @@
+/* ============================================================
+   校友风采 样式
+   负责：校友风采板块的同学。
+   ============================================================ */
+
+/* ---------- 12. 引言 ---------- */
+.quote {
+  padding: 120px 0;
+  background:
+    radial-gradient(80% 120% at 50% 0%, rgba(14, 76, 146, 0.55), transparent 65%),
+    var(--blue-900);
+  text-align: center;
+}
+
+.quote-text {
+  margin: 0;
+  font-size: clamp(20px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.9;
+  color: #fff;
+}
+
+.quote-author {
+  margin-top: 26px;
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  color: var(--gold-soft);
+}
+
+
+/* ---------- 19. 校友风采 ---------- */
+.alumni-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 26px;
+}
+
+.alumni-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 28px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.alumni-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(217, 164, 65, 0.45);
+  box-shadow: var(--shadow);
+}
+
+.alumni-avatar {
+  flex: 0 0 62px;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
+}
+
+.alumni-card:nth-child(3n + 2) .alumni-avatar {
+  background: linear-gradient(135deg, var(--gold-deep), var(--gold));
+}
+
+.alumni-body h3 {
+  font-size: 17px;
+  letter-spacing: 0.06em;
+}
+
+.alumni-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.alumni-quote {
+  margin-top: 10px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--text);
+  text-align: justify;
+}
+
+
+/* ---------- 25. 校友头像：照片模式 ---------- */
+.alumni-avatar {
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  font-size: 25px;
+}
+
+img.alumni-avatar {
+  display: block;
+  object-fit: cover;
+  object-position: center 30%;
+  background: none;
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.3);
+}
+
+.alumni-card:nth-child(3n + 2) img.alumni-avatar {
+  background: none;
+}

@@ -1,0 +1,221 @@
+/* ============================================================
+   学科成果 样式
+   负责：学科成果板块的同学。
+   ============================================================ */
+
+/* ---------- 7. 数据概览 ---------- */
+.stats {
+  position: relative;
+  z-index: 5;
+  margin-top: -70px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 40px 24px;
+  background: var(--white);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+
+.stat {
+  text-align: center;
+  padding: 10px 12px;
+  border-right: 1px solid var(--line);
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.stat-num {
+  display: block;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--blue-600);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.stat-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+
+
+/* ---------- 10. 成果卡片 ---------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 26px;
+}
+
+.card {
+  padding: 34px 30px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease, background 0.35s ease;
+}
+
+.section--alt .card {
+  background: var(--white);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  background: var(--white);
+  border-color: rgba(217, 164, 65, 0.45);
+  box-shadow: var(--shadow);
+}
+
+.card-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(14, 76, 146, 0.1), rgba(217, 164, 65, 0.18));
+  color: var(--blue-600);
+}
+
+.card-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.card h3 {
+  font-size: 18px;
+  letter-spacing: 0.05em;
+}
+
+.card p {
+  margin-top: 12px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+
+/* ---------- 11. 轮播 ---------- */
+.carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+  background: var(--blue-900);
+  box-shadow: var(--shadow);
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.75s cubic-bezier(0.66, 0, 0.34, 1);
+  will-change: transform;
+}
+
+.slide {
+  position: relative;
+  flex: 0 0 100%;
+  margin: 0;
+}
+
+.slide img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+.slide-body {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 90px 48px 72px;
+  background: linear-gradient(180deg, transparent, rgba(4, 16, 30, 0.88) 62%);
+  color: #fff;
+}
+
+.slide-index {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  color: var(--gold-soft);
+}
+
+.slide-body h3 {
+  font-size: clamp(20px, 2.4vw, 28px);
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+
+.slide-body p {
+  margin-top: 8px;
+  font-size: 14.5px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  font-size: 28px;
+  line-height: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  transition: background 0.25s, color 0.25s, transform 0.25s;
+}
+
+.carousel-btn:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #241a06;
+}
+
+.carousel-btn--prev { left: 24px; }
+.carousel-btn--next { right: 24px; }
+
+.carousel-dots {
+  position: absolute;
+  left: 48px;
+  bottom: 28px;
+  display: flex;
+  gap: 10px;
+}
+
+.carousel-dots button {
+  width: 9px;
+  height: 9px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.4);
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+.carousel-dots button.is-active {
+  width: 30px;
+  background: var(--gold);
+}
+
+
+/* =========================================================
+   以下为四板块改版新增样式
+   ========================================================= */
+
+/* ---------- 18. 学科成果：内嵌数据条 ---------- */
+.stats-inline {
+  margin-bottom: 60px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
