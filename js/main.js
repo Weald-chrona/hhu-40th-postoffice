@@ -268,3 +268,140 @@
   var half = track.scrollWidth / 2;
   track.style.animationDuration = Math.max(18, half / 90) + "s";
 })();
+
+/* ---------- 9. 板块切换：点导航切换内容，不再整页滚动 ---------- */
+(function () {
+  "use strict";
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var HASH_BY_TAB = {
+    home: "#top",
+    history: "#history",
+    achievements: "#achievements",
+    alumni: "#alumni",
+    postoffice: "#blessings"
+  };
+
+  var TAB_BY_HASH = {
+    "#top": "home",
+    "#history": "history",
+    "#achievements": "achievements",
+    "#alumni": "alumni",
+    "#blessings": "postoffice"
+  };
+
+  var panels = Array.prototype.slice.call(document.querySelectorAll("[data-panel]"));
+  var links = Array.prototype.slice.call(document.querySelectorAll("a[data-tab]"));
+  var nav = document.getElementById("nav");
+
+  // about.html 上没有这些面板，直接跳过，不影响其他页面
+  if (!panels.length || !links.length) return;
+
+  var current = null;
+
+  /* 切换时重播入场动画：先清掉状态，再按次序加回来，形成错落感 */
+  function playReveal(scope) {
+    var items = Array.prototype.slice.call(scope.querySelectorAll(".reveal"));
+    if (!items.length) return;
+
+    items.forEach(function (el, i) {
+      el.classList.remove("is-visible");
+      el.style.transitionDelay = Math.min(i * 0.07, 0.5) + "s";
+    });
+
+    void scope.offsetHeight;
+
+    requestAnimationFrame(function () {
+      items.forEach(function (el) { el.classList.add("is-visible"); });
+    });
+  }
+
+  /* 数字滚动：每个数字只在第一次切到该板块时跑一次 */
+  function playCounters(scope) {
+    Array.prototype.forEach.call(scope.querySelectorAll(".stat-num"), function (el) {
+      if (el.getAttribute("data-counted") === "1") return;
+      el.setAttribute("data-counted", "1");
+
+      var target = parseInt(el.getAttribute("data-count"), 10) || 0;
+      var suffix = el.getAttribute("data-suffix") || "";
+
+      if (reduceMotion) {
+        el.textContent = target + suffix;
+        return;
+      }
+
+      var start = null;
+      var duration = 1200;
+
+      function tick(now) {
+        if (start === null) start = now;
+        var p = Math.min((now - start) / duration, 1);
+        el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + suffix;
+        if (p < 1) requestAnimationFrame(tick);
+      }
+
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function show(name, pushHash) {
+    if (!HASH_BY_TAB[name]) name = "home";
+    if (name === current) return;
+    current = name;
+
+    var shown = [];
+
+    panels.forEach(function (p) {
+      var on = p.getAttribute("data-panel") === name;
+      p.classList.toggle("is-hidden", !on);
+      if (on) shown.push(p);
+    });
+
+    links.forEach(function (a) {
+      var on = a.getAttribute("data-tab") === name;
+      a.classList.toggle("is-active", on);
+      if (on) a.setAttribute("aria-current", "true");
+      else a.removeAttribute("aria-current");
+    });
+
+    // 首页封面是深色大图，导航透明才好看；切到板块后要变实心，否则白底上看不清
+    if (nav) nav.classList.toggle("is-solid", name !== "home");
+
+    window.scrollTo(0, 0);
+
+    shown.forEach(function (p) {
+      playReveal(p);
+      playCounters(p);
+    });
+
+    var hash = HASH_BY_TAB[name];
+    if (pushHash !== false && location.hash !== hash) {
+      try {
+        history.pushState(null, "", hash);
+      } catch (err) {
+        location.hash = hash;
+      }
+    }
+  }
+
+  links.forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      show(a.getAttribute("data-tab"), true);
+    });
+  });
+
+  window.addEventListener("hashchange", function () {
+    var tab = TAB_BY_HASH[location.hash];
+    if (tab && tab !== current) show(tab, false);
+  });
+
+  window.addEventListener("popstate", function () {
+    var tab = TAB_BY_HASH[location.hash] || "home";
+    if (tab !== current) show(tab, false);
+  });
+
+  // 首次进入：地址栏带 #history 就直接打开那个板块
+  show(TAB_BY_HASH[location.hash] || "home", false);
+})();

@@ -10,6 +10,16 @@
     letter-spacing: 0.06em;
   }
 
+  /* 导航多了「首页」一项，中等屏幕上收紧间距，避免挤成两行 */
+  .nav-links {
+    gap: 0;
+  }
+
+  .nav-links a {
+    padding: 9px 11px;
+    font-size: 14px;
+  }
+
   .about-intro,
   .contact {
     gap: 48px;

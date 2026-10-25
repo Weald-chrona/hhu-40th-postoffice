@@ -79,3 +79,40 @@ supabase/               数据库脚本
 
 > ⚠️ `index.html` 里 `<link>` 的顺序是**加载顺序**，也是样式层叠的先后，别随便调。
 > 要做移动端适配，写进 `css/responsive.css`。
+
+---
+
+## 四十号邮局：两种模式
+
+### 现在打开就是「本地演示模式」
+
+`js/config.js` 里两个 key 是空的，所以信件存在浏览器的 localStorage 里——
+**写信 → 出现在信箱里 → 刷新页面还在**，完整流程都能跑，只是数据只在这台电脑上。
+
+演示答辩、录视频用这个模式就够了，不需要网络，也不需要数据库。
+
+### 切到真实数据库（Supabase）
+
+1. 打开 supabase.com 新建项目（免费）
+2. 左侧 **SQL Editor** → 把 `supabase/schema.sql` 整段粘进去 → **Run**
+   这一步会建好 `letters` 表、开启 RLS 行级安全、创建点赞函数
+3. **Project Settings → API** 里复制两个值，填进 `js/config.js`：
+
+```js
+supabaseUrl: 'https://xxxxxxxx.supabase.co',   // Project URL
+supabaseKey: 'eyJhbGciOi...',                  // anon public
+```
+
+刷新页面，写信区会显示「已连接云端数据库」，之后写的信就存在云上了。
+**不用改任何其他代码。**
+
+> ⚠️ RLS 一定要开（schema.sql 里已经开了）。anon key 会随网页发出去，
+> 任何人都能看到，没有 RLS 就等于数据库裸奔。
+
+### 自检
+
+```bash
+node tests/po.logic.test.js
+```
+
+12 项逻辑测试（敏感词两道防线、配置完整性）应当全部 PASS。
