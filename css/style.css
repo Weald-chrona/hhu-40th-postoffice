@@ -137,6 +137,15 @@ button {
   box-shadow: 0 12px 30px -20px rgba(0, 0, 0, 0.9);
 }
 
+/* 切到板块后页面回到顶部，此时滚动监听会把 is-scrolled 摘掉，
+   导航变透明会盖在浅色板块上看不清，所以用 is-solid 常驻实心 */
+.nav.is-solid {
+  background: rgba(4, 16, 30, 0.9);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 30px -20px rgba(0, 0, 0, 0.9);
+}
+
 .nav-inner {
   height: var(--nav-h);
   display: flex;
@@ -763,6 +772,29 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
   .photo-track { animation: none; }
+}
+
+/* =========================================================
+   板块切换：同一时刻只显示一个 [data-panel]
+   隐藏用 .is-hidden，切换逻辑在 js/main.js 里
+   ========================================================= */
+[data-panel].is-hidden {
+  display: none !important;
+}
+
+.nav-links a.is-active {
+  color: #fff;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.nav-links a.is-active::after {
+  width: 22px;
+}
+
+.footer-links a.is-active {
+  color: var(--gold);
+  font-weight: 600;
 }
 
 
