@@ -1,6 +1,7 @@
 /* ============================================================
-   校友风采 样式
-   负责：校友风采板块的同学。
+   校友风采 样式（美化版）
+   负责：队友 B
+   改动：头像放大到 88px、简介默认 5 行 + 展开全文、届别做成标签
    ============================================================ */
 
 /* ---------- 12. 引言 ---------- */
@@ -28,75 +29,49 @@
   color: var(--gold-soft);
 }
 
-
 /* ---------- 19. 校友风采 ---------- */
 .alumni-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 26px;
+  align-items: start;
 }
 
 .alumni-card {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
-  padding: 28px;
+  gap: 22px;
+  padding: 30px 28px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease, background 0.35s ease;
 }
 
 .alumni-card:hover {
   transform: translateY(-6px);
+  background: var(--white);
   border-color: rgba(217, 164, 65, 0.45);
   box-shadow: var(--shadow);
 }
 
 .alumni-avatar {
-  flex: 0 0 62px;
-  width: 62px;
-  height: 62px;
+  flex: 0 0 88px;
+  width: 88px;
+  height: 88px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 800;
   color: #fff;
   background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
+  transition: transform 0.35s ease;
 }
 
 .alumni-card:nth-child(3n + 2) .alumni-avatar {
   background: linear-gradient(135deg, var(--gold-deep), var(--gold));
-}
-
-.alumni-body h3 {
-  font-size: 17px;
-  letter-spacing: 0.06em;
-}
-
-.alumni-meta {
-  margin-top: 4px;
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  color: var(--muted);
-}
-
-.alumni-quote {
-  margin-top: 10px;
-  font-size: 13.5px;
-  line-height: 1.8;
-  color: var(--text);
-  text-align: justify;
-}
-
-
-/* ---------- 25. 校友头像：照片模式 ---------- */
-.alumni-avatar {
-  flex: 0 0 72px;
-  width: 72px;
-  height: 72px;
-  font-size: 25px;
 }
 
 img.alumni-avatar {
@@ -104,9 +79,65 @@ img.alumni-avatar {
   object-fit: cover;
   object-position: center 30%;
   background: none;
-  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.3);
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.28),
+    0 12px 26px -16px rgba(6, 27, 51, 0.7);
 }
 
-.alumni-card:nth-child(3n + 2) img.alumni-avatar {
+.alumni-card:hover img.alumni-avatar {
+  transform: scale(1.03);
+}
+
+.alumni-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.alumni-body h3 {
+  font-size: 18px;
+  letter-spacing: 0.05em;
+}
+
+.alumni-meta {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: rgba(14, 76, 146, 0.07);
+  font-size: 12.5px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.alumni-quote {
+  margin-top: 12px;
+  font-size: 13.5px;
+  line-height: 1.85;
+  color: var(--text);
+  text-align: justify;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.alumni-card.is-open .alumni-quote {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
+.alumni-more {
+  margin-top: 10px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--gold-deep);
   background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.alumni-more:hover {
+  color: var(--blue-600);
 }

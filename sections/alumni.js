@@ -1,7 +1,8 @@
 /* ============================================================
    三、校友风采
-   本文件由拆分脚本从原 index.html 搬出，内容与原样一致。
-   负责这一板块的同学只需要改这个文件。
+   负责：队友 B
+   说明：上方是板块 HTML，下方追加了「展开全文」的交互脚本。
+   改内容时只改动中文文案，别动标签结构。
    ============================================================ */
 (function () {
   var html = `    <!-- ===== 三、校友风采 ===== -->
@@ -50,8 +51,6 @@
             </div>
           </article>
 
-          
-
           <article class="alumni-card reveal">
             <img class="alumni-avatar" src="images/alumni-5.jpg" alt="校友江龙韬" />
             <div class="alumni-body">
@@ -66,4 +65,29 @@
 `;
   var mount = document.getElementById("sec-alumni");
   if (mount) mount.outerHTML = html;
+})();
+
+/* ---------- 校友简介超过 5 行时，显示「展开全文」 ---------- */
+(function () {
+  var quotes = document.querySelectorAll(".alumni-quote");
+
+  Array.prototype.forEach.call(quotes, function (q) {
+    // 内容没被截断就不加按钮
+    if (q.scrollHeight <= q.clientHeight + 4) return;
+
+    var card = q.closest(".alumni-card");
+    if (!card) return;
+
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "alumni-more";
+    btn.textContent = "展开全文";
+
+    btn.addEventListener("click", function () {
+      var open = card.classList.toggle("is-open");
+      btn.textContent = open ? "收起" : "展开全文";
+    });
+
+    q.parentNode.insertBefore(btn, q.nextSibling);
+  });
 })();

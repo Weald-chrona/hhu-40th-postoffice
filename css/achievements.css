@@ -1,6 +1,7 @@
 /* ============================================================
-   学科成果 样式
-   负责：学科成果板块的同学。
+   学科成果 样式（美化版）
+   负责：队友 B
+   改动：数据条改深色玻璃卡 + 数字渐变；成果卡加顶部金线与图标悬停
    ============================================================ */
 
 /* ---------- 7. 数据概览 ---------- */
@@ -48,6 +49,49 @@
   color: var(--muted);
 }
 
+/* ---------- 18. 学科成果：深色数据条 ---------- */
+.stats-inline {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 64px;
+  padding: 44px 28px;
+  background:
+    radial-gradient(120% 170% at 0% 0%, rgba(46, 123, 196, 0.42), transparent 62%),
+    linear-gradient(135deg, #061728, #0b2f55 58%, #071a2e);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  box-shadow: 0 30px 70px -42px rgba(6, 27, 51, 0.9);
+}
+
+.stats-inline::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0.75;
+}
+
+.stats-inline .stat {
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.stats-inline .stat:last-child {
+  border-right: none;
+}
+
+.stats-inline .stat-num {
+  background: linear-gradient(135deg, #ffe6b0, var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 8px 20px rgba(217, 164, 65, 0.3));
+}
+
+.stats-inline .stat-label {
+  color: rgba(255, 255, 255, 0.62);
+}
 
 /* ---------- 10. 成果卡片 ---------- */
 .cards {
@@ -57,12 +101,25 @@
 }
 
 .card {
+  position: relative;
+  overflow: hidden;
   padding: 34px 30px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   transition: transform 0.35s ease, box-shadow 0.35s ease,
     border-color 0.35s ease, background 0.35s ease;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue-600), var(--gold));
+  transform: scaleX(0.24);
+  transform-origin: left;
+  transition: transform 0.45s ease;
 }
 
 .section--alt .card {
@@ -76,6 +133,10 @@
   box-shadow: var(--shadow);
 }
 
+.card:hover::before {
+  transform: scaleX(1);
+}
+
 .card-icon {
   display: grid;
   place-items: center;
@@ -84,7 +145,17 @@
   margin-bottom: 24px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(14, 76, 146, 0.1), rgba(217, 164, 65, 0.18));
+  border: 1px solid rgba(217, 164, 65, 0.22);
   color: var(--blue-600);
+  transition: background 0.35s ease, color 0.35s ease,
+    border-color 0.35s ease, transform 0.35s ease;
+}
+
+.card:hover .card-icon {
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  border-color: transparent;
+  color: #241a06;
+  transform: translateY(-2px);
 }
 
 .card-icon svg {
@@ -103,7 +174,7 @@
   color: var(--muted);
 }
 
-/* ---------- 11. 轮播 ---------- */
+/* ---------- 11. 轮播（当前页面未使用，保留备用） ---------- */
 .carousel {
   position: relative;
   overflow: hidden;
@@ -205,17 +276,4 @@
 .carousel-dots button.is-active {
   width: 30px;
   background: var(--gold);
-}
-
-
-/* =========================================================
-   以下为四板块改版新增样式
-   ========================================================= */
-
-/* ---------- 18. 学科成果：内嵌数据条 ---------- */
-.stats-inline {
-  margin-bottom: 60px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  box-shadow: none;
 }
