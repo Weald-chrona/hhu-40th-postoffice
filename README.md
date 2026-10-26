@@ -23,9 +23,9 @@
 
 | 负责人 | 分支 | 板块 | 你只需要改这些文件 |
 |---|---|---|---|
-| 队友 A | `feat/history` | 一、院史时间轴 | `sections/history.js`、`css/history.css` |
+| 队友 A | `feat/history-timeline` | 一、院史时间轴 | `sections/history.js`、`css/history.css` |
 | 队友 B | `feat/achievements-alumni` | 二、学科成果 + 三、校友风采 | `sections/achievements.js`、`sections/alumni.js`、`css/achievements.css`、`css/alumni.css` |
-| 我（组长） | `feat/postoffice` | 四、四十号邮局（动态） | `sections/postoffice.js`、`css/postoffice.css`、`js/letters.js`、`js/config.js`、`supabase/schema.sql` |
+| 我（组长） | `feat/40th-postoffice` | 四、四十号邮局（动态） | `sections/postoffice.js`、`css/postoffice.css`、`js/letters.js`、`js/config.js`、`supabase/schema.sql` |
 
 **一句话原则：自己的活只在自己那几个文件里改，别碰别人的。**
 真要改公共部分（导航栏、页脚、`css/style.css`），先在群里说一声。
