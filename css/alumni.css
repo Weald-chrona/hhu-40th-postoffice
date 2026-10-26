@@ -1,47 +1,57 @@
 /* ============================================================
-   校友风采 样式（美化版）
+   校友风采 样式
    负责：队友 B
-   改动：头像放大到 88px、简介默认 5 行 + 展开全文、届别做成标签
+   要点：人物档案式竖版卡片（大头像 132px）+ 入学年份筛选 + 简介展开
    ============================================================ */
 
-/* ---------- 12. 引言 ---------- */
-.quote {
-  padding: 120px 0;
-  background:
-    radial-gradient(80% 120% at 50% 0%, rgba(14, 76, 146, 0.55), transparent 65%),
-    var(--blue-900);
-  text-align: center;
+/* ---------- 筛选按钮 ---------- */
+.alumni-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 44px;
 }
 
-.quote-text {
-  margin: 0;
-  font-size: clamp(20px, 3vw, 36px);
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  line-height: 1.9;
-  color: #fff;
-}
-
-.quote-author {
-  margin-top: 26px;
+.alumni-filter button {
+  padding: 9px 22px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--text);
   font-size: 14px;
-  letter-spacing: 0.3em;
-  color: var(--gold-soft);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease, transform 0.25s ease;
 }
 
-/* ---------- 19. 校友风采 ---------- */
+.alumni-filter button:hover {
+  border-color: rgba(217, 164, 65, 0.6);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.alumni-filter button.is-active {
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  border-color: transparent;
+  color: #241a06;
+  font-weight: 600;
+}
+
+/* ---------- 卡片网格 ---------- */
 .alumni-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 26px;
   align-items: start;
 }
 
 .alumni-card {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 22px;
-  padding: 30px 28px;
+  padding: 32px 28px 28px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -56,14 +66,20 @@
   box-shadow: var(--shadow);
 }
 
+.alumni-card.is-hidden {
+  display: none;
+}
+
+/* ---------- 大头像 ---------- */
 .alumni-avatar {
-  flex: 0 0 88px;
-  width: 88px;
-  height: 88px;
+  flex: 0 0 auto;
+  width: 132px;
+  height: 132px;
+  margin-bottom: 22px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 30px;
+  font-size: 44px;
   font-weight: 800;
   color: #fff;
   background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
@@ -79,28 +95,29 @@ img.alumni-avatar {
   object-fit: cover;
   object-position: center 30%;
   background: none;
-  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.28),
-    0 12px 26px -16px rgba(6, 27, 51, 0.7);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.26),
+    0 18px 36px -20px rgba(6, 27, 51, 0.75);
 }
 
 .alumni-card:hover img.alumni-avatar {
   transform: scale(1.03);
 }
 
+/* ---------- 文字区 ---------- */
 .alumni-body {
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
 }
 
 .alumni-body h3 {
-  font-size: 18px;
+  font-size: 20px;
   letter-spacing: 0.05em;
 }
 
 .alumni-meta {
   display: inline-block;
-  margin-top: 6px;
-  padding: 3px 10px;
+  margin-top: 8px;
+  padding: 3px 12px;
   border-radius: 99px;
   background: rgba(14, 76, 146, 0.07);
   font-size: 12.5px;
@@ -109,7 +126,7 @@ img.alumni-avatar {
 }
 
 .alumni-quote {
-  margin-top: 12px;
+  margin-top: 14px;
   font-size: 13.5px;
   line-height: 1.85;
   color: var(--text);
@@ -118,6 +135,15 @@ img.alumni-avatar {
   -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.alumni-quote::before {
+  content: "“";
+  margin-right: 2px;
+  font-size: 28px;
+  line-height: 0;
+  vertical-align: -8px;
+  color: var(--gold);
 }
 
 .alumni-card.is-open .alumni-quote {
@@ -140,4 +166,18 @@ img.alumni-avatar {
 
 .alumni-more:hover {
   color: var(--blue-600);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 560px) {
+  .alumni-avatar {
+    width: 104px;
+    height: 104px;
+    font-size: 36px;
+  }
+
+  .alumni-filter button {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
 }
