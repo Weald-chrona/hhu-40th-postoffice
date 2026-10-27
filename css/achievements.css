@@ -1,10 +1,10 @@
 /* ============================================================
-   学科成果 样式（美化版）
+   学科成果 样式（重构版）
    负责：队友 B
-   改动：数据条改深色玻璃卡 + 数字渐变；成果卡加顶部金线与图标悬停
+   结构：基础数据条 → 成果卡 → 特色引语 → 学科方向双栏 → 学科里程碑
    ============================================================ */
 
-/* ---------- 7. 数据概览 ---------- */
+/* ---------- 7. 数据条（基础） ---------- */
 .stats {
   position: relative;
   z-index: 5;
@@ -49,48 +49,12 @@
   color: var(--muted);
 }
 
-/* ---------- 18. 学科成果：深色数据条 ---------- */
+/* ---------- 数据条（本板块） ---------- */
 .stats-inline {
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 64px;
-  padding: 44px 28px;
-  background:
-    radial-gradient(120% 170% at 0% 0%, rgba(46, 123, 196, 0.42), transparent 62%),
-    linear-gradient(135deg, #061728, #0b2f55 58%, #071a2e);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 22px;
-  box-shadow: 0 30px 70px -42px rgba(6, 27, 51, 0.9);
-}
-
-.stats-inline::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  opacity: 0.75;
-}
-
-.stats-inline .stat {
-  position: relative;
-  border-right: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.stats-inline .stat:last-child {
-  border-right: none;
-}
-
-.stats-inline .stat-num {
-  background: linear-gradient(135deg, #ffe6b0, var(--gold));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 8px 20px rgba(217, 164, 65, 0.3));
-}
-
-.stats-inline .stat-label {
-  color: rgba(255, 255, 255, 0.62);
+  margin-bottom: 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: none;
 }
 
 /* ---------- 10. 成果卡片 ---------- */
@@ -101,25 +65,12 @@
 }
 
 .card {
-  position: relative;
-  overflow: hidden;
   padding: 34px 30px;
   background: var(--bg);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   transition: transform 0.35s ease, box-shadow 0.35s ease,
     border-color 0.35s ease, background 0.35s ease;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--blue-600), var(--gold));
-  transform: scaleX(0.24);
-  transform-origin: left;
-  transition: transform 0.45s ease;
 }
 
 .section--alt .card {
@@ -133,10 +84,6 @@
   box-shadow: var(--shadow);
 }
 
-.card:hover::before {
-  transform: scaleX(1);
-}
-
 .card-icon {
   display: grid;
   place-items: center;
@@ -145,17 +92,7 @@
   margin-bottom: 24px;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(14, 76, 146, 0.1), rgba(217, 164, 65, 0.18));
-  border: 1px solid rgba(217, 164, 65, 0.22);
   color: var(--blue-600);
-  transition: background 0.35s ease, color 0.35s ease,
-    border-color 0.35s ease, transform 0.35s ease;
-}
-
-.card:hover .card-icon {
-  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
-  border-color: transparent;
-  color: #241a06;
-  transform: translateY(-2px);
 }
 
 .card-icon svg {
@@ -174,106 +111,396 @@
   color: var(--muted);
 }
 
-/* ---------- 11. 轮播（当前页面未使用，保留备用） ---------- */
-.carousel {
-  position: relative;
-  overflow: hidden;
-  border-radius: 22px;
-  background: var(--blue-900);
+/* ---------- 特色引语 ---------- */
+.disc-lead {
+  margin: 0 auto 56px;
+  max-width: 860px;
+  padding-left: 24px;
+  border-left: 3px solid var(--gold);
+}
+
+.disc-lead p {
+  font-size: clamp(15px, 1.7vw, 19px);
+  line-height: 2;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.disc-lead b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ---------- 学科方向双栏 ---------- */
+.disc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 56px;
+}
+
+.disc-card {
+  padding: 34px 32px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--blue-600);
+  border-radius: var(--radius);
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease, border-top-color 0.35s ease;
+}
+
+.disc-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(217, 164, 65, 0.5);
+  border-top-color: var(--gold);
   box-shadow: var(--shadow);
 }
 
-.carousel-track {
-  display: flex;
-  transition: transform 0.75s cubic-bezier(0.66, 0, 0.34, 1);
-  will-change: transform;
+.disc-card header {
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed var(--line);
 }
 
-.slide {
-  position: relative;
-  flex: 0 0 100%;
-  margin: 0;
+.disc-card h3 {
+  font-size: 21px;
+  letter-spacing: 0.05em;
 }
 
-.slide img {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  opacity: 0.9;
-}
-
-.slide-body {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: 90px 48px 72px;
-  background: linear-gradient(180deg, transparent, rgba(4, 16, 30, 0.88) 62%);
-  color: #fff;
-}
-
-.slide-index {
-  display: inline-block;
-  margin-bottom: 8px;
+.disc-sub {
+  margin-top: 8px;
   font-size: 13px;
-  letter-spacing: 0.3em;
-  color: var(--gold-soft);
+  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
-.slide-body h3 {
-  font-size: clamp(20px, 2.4vw, 28px);
-  color: #fff;
+.disc-card ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.disc-card li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.disc-card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--blue-400), var(--gold));
+}
+
+/* ---------- 学科里程碑 ---------- */
+.disc-milestones {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 14px 10px;
+  margin: 0 0 64px;
+  padding: 26px 22px 22px;
+  list-style: none;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.disc-milestones::before {
+  content: "";
+  position: absolute;
+  left: 40px;
+  right: 40px;
+  top: 60px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(14, 76, 146, 0.25), transparent);
+}
+
+.disc-milestones li {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 120px;
+  text-align: center;
+}
+
+.ms-year {
+  display: block;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--blue-600);
+}
+
+.ms-year::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  margin: 8px auto 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.16);
+}
+
+.ms-text {
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .disc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .disc-milestones {
+    justify-content: flex-start;
+  }
+
+  .disc-milestones::before {
+    display: none;
+  }
+
+  .disc-milestones li {
+    flex: 0 0 calc(33.333% - 10px);
+    margin-bottom: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .disc-lead {
+    padding-left: 16px;
+  }
+
+  .disc-milestones li {
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+/* ---------- 学科平台矩阵 ---------- */
+.platform-block {
+  margin-bottom: 64px;
+  padding: 34px 32px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.platform-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.platform-head h3 {
+  font-size: 21px;
+  letter-spacing: 0.05em;
+}
+
+.platform-head p {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.platform-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  background: linear-gradient(120deg, rgba(14, 76, 146, 0.06), rgba(217, 164, 65, 0.13));
+  border-left: 3px solid var(--gold);
+  border-radius: 10px;
+}
+
+.platform-badge {
+  flex: 0 0 auto;
+  padding: 3px 12px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  color: #241a06;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.06em;
 }
 
-.slide-body p {
-  margin-top: 8px;
-  font-size: 14.5px;
-  color: rgba(255, 255, 255, 0.72);
+.platform-badge--sub {
+  background: rgba(14, 76, 146, 0.1);
+  color: var(--blue-600);
 }
 
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: grid;
-  place-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  font-size: 28px;
-  line-height: 1;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(8px);
-  transition: background 0.25s, color 0.25s, transform 0.25s;
+.platform-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
 }
 
-.carousel-btn:hover {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #241a06;
-}
-
-.carousel-btn--prev { left: 24px; }
-.carousel-btn--next { right: 24px; }
-
-.carousel-dots {
-  position: absolute;
-  left: 48px;
-  bottom: 28px;
+.platform-group {
   display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.platform-tags {
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
-.carousel-dots button {
-  width: 9px;
-  height: 9px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.4);
-  transition: width 0.3s ease, background 0.3s ease;
+.platform-tags span {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
 }
 
-.carousel-dots button.is-active {
-  width: 30px;
-  background: var(--gold);
+.platform-tags span:hover {
+  border-color: rgba(217, 164, 65, 0.6);
+  background: var(--white);
+  color: var(--ink);
+}
+
+.cards--three {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .platform-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* ---------- 师资队伍 ---------- */
+.team-block {
+  margin-bottom: 64px;
+  padding: 34px 32px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.team-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.team-stats > div {
+  padding: 16px 6px;
+  text-align: center;
+  background: var(--bg);
+  border-radius: 10px;
+}
+
+.team-stats b {
+  display: block;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--blue-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.team-stats span {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.team-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.team-foot {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .team-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .team-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .team-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- 引语下方的一行数字 ---------- */
+.disc-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--line);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.disc-facts span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.disc-facts b {
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--blue-600);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 560px) {
+  .disc-facts {
+    gap: 8px 18px;
+    font-size: 13px;
+  }
+
+  .disc-facts b {
+    font-size: 18px;
+  }
 }
