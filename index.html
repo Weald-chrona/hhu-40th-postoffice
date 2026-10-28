@@ -30,10 +30,11 @@
       </a>
 
       <nav class="nav-links" id="navLinks" aria-label="主导航">
-        <a href="#history">校史时间轴</a>
-        <a href="#achievements">学科成果</a>
-        <a href="#alumni">校友风采</a>
-        <a href="#blessings">祝福留言墙</a>
+        <a href="#top" data-tab="home">首页</a>
+        <a href="#history" data-tab="history">校史时间轴</a>
+        <a href="#achievements" data-tab="achievements">学科成果</a>
+        <a href="#alumni" data-tab="alumni">校友风采</a>
+        <a href="#blessings" data-tab="postoffice">四十号邮局</a>
         <a href="about.html">学院概况</a>
       </nav>
 
@@ -45,8 +46,8 @@
   </header>
 
   <main id="main">
-    <!-- ===== 主视觉 ===== -->
-    <section class="hero" id="top">
+    <!-- ===== 主视觉（只在首页出现，切到板块后收起） ===== -->
+    <section class="hero" id="top" data-panel="home">
       <div class="hero-bg" aria-hidden="true"></div>
       <div class="hero-overlay" aria-hidden="true"></div>
 
@@ -58,19 +59,18 @@
         </h1>
         <p class="hero-sub">1986 — 2026 · 四十载弦歌不辍，新征程智启未来</p>
         <div class="hero-actions">
-          <a class="btn btn--primary" href="#history">走进四秩历程</a>
-          <a class="btn btn--ghost" href="about.html">学院概况</a>
+          <a class="btn btn--primary" href="#history" data-tab="history">走进四秩历程</a>
         </div>
       </div>
 
-      <a class="scroll-hint" href="#history" aria-label="向下浏览">
+      <a class="scroll-hint" href="#history" data-tab="history" aria-label="浏览校史时间轴">
         <span></span>
       </a>
     </section>
 
 
-    <!-- ===== 照片带（横向无缝滚动） ===== -->
-    <section class="photo-strip" aria-label="学院掠影照片带">
+    <!-- ===== 照片带（横向无缝滚动，只在首页出现） ===== -->
+    <section class="photo-strip" data-panel="home" aria-label="学院掠影照片带">
       <div class="photo-track" id="photoTrack">
         <figure class="photo-item"><img src="images/strip-1.jpg" alt="新生第一课：人工智能主题讲座" /></figure>
         <figure class="photo-item"><img src="images/strip-2.jpg" alt="摄影培训讲座现场" /></figure>
@@ -83,17 +83,28 @@
       </div>
     </section>
 
-    <!-- ===== 一、校史时间轴（内容来自 sections/history.js） ===== -->
-    <div id="sec-history"></div>
+    <!-- ===== 板块切换区：同一时刻只显示一个 data-panel =====
+         外层 .panel 是切换开关，内层 #sec-xxx 才是 sections/*.js 注入内容的位置，
+         所以 sections 里的文件不需要任何改动。 -->
+    <div class="panel" data-panel="history">
+      <!-- ===== 一、校史时间轴（内容来自 sections/history.js） ===== -->
+      <div id="sec-history"></div>
+    </div>
 
-    <!-- ===== 二、学科成果（内容来自 sections/achievements.js） ===== -->
-    <div id="sec-achievements"></div>
+    <div class="panel" data-panel="achievements">
+      <!-- ===== 二、学科成果（内容来自 sections/achievements.js） ===== -->
+      <div id="sec-achievements"></div>
+    </div>
 
-    <!-- ===== 三、校友风采（内容来自 sections/alumni.js） ===== -->
-    <div id="sec-alumni"></div>
+    <div class="panel" data-panel="alumni">
+      <!-- ===== 三、校友风采（内容来自 sections/alumni.js） ===== -->
+      <div id="sec-alumni"></div>
+    </div>
 
-    <!-- ===== 四、四十号邮局（留言墙，待重做）（内容来自 sections/postoffice.js） ===== -->
-    <div id="sec-postoffice"></div>
+    <div class="panel" data-panel="postoffice">
+      <!-- ===== 四、四十号邮局（内容来自 sections/postoffice.js） ===== -->
+      <div id="sec-postoffice"></div>
+    </div>
   </main>
 
   <!-- ===== 页脚 ===== -->
@@ -108,10 +119,11 @@
       </div>
 
       <nav class="footer-links" aria-label="页脚导航">
-        <a href="#history">校史时间轴</a>
-        <a href="#achievements">学科成果</a>
-        <a href="#alumni">校友风采</a>
-        <a href="#blessings">祝福留言墙</a>
+        <a href="#top" data-tab="home">首页</a>
+        <a href="#history" data-tab="history">校史时间轴</a>
+        <a href="#achievements" data-tab="achievements">学科成果</a>
+        <a href="#alumni" data-tab="alumni">校友风采</a>
+        <a href="#blessings" data-tab="postoffice">四十号邮局</a>
         <a href="about.html">学院概况</a>
       </nav>
 
@@ -132,6 +144,13 @@
   <script src="sections/achievements.js"></script>
   <script src="sections/alumni.js"></script>
   <script src="sections/postoffice.js"></script>
+
+  <!-- ↓↓↓ 四十号邮局：CDN 拉不到 Supabase 会自动降级成本地演示模式，页面照常可用 ↓↓↓ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/sensitiveWords.js"></script>
+  <script src="js/letters.js"></script>
+
   <script src="js/main.js"></script>
 </body>
 </html>

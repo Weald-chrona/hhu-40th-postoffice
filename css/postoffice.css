@@ -1,72 +1,622 @@
 /* ============================================================
    四十号邮局 样式
    负责：邮局（留言墙）板块的同学。
+   ------------------------------------------------------------
+   配色沿用全站变量（--blue-700 / --gold / --ink），
+   只额外引入信纸米白 --po-paper，让写信区跟其他板块一眼区分开。
    ============================================================ */
 
-/* ---------- 20. 祝福留言墙 ---------- */
-.blessing-wall {
-  column-count: 3;
-  column-gap: 22px;
+:root {
+  --po-paper: #fbf6ec;   /* 信纸米白 */
+  --po-edge: #e3d7c2;    /* 信纸压痕 */
+  --po-ink: #4a4036;     /* 墨色 */
 }
 
-.blessing-card {
-  break-inside: avoid;
-  -webkit-column-break-inside: avoid;
-  margin-bottom: 22px;
-  padding: 26px 24px;
+/* ---------- 六个信箱：抽屉墙 ---------- */
+.po-mailboxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.po-box {
+  position: relative;
+  padding: 26px 22px 22px;
   border-radius: 14px;
-  background: var(--white);
-  border: 1px solid rgba(11, 59, 111, 0.08);
-  box-shadow: 0 14px 30px -24px rgba(6, 27, 51, 0.7);
-  rotate: var(--tilt, 0deg);
-  transition: rotate 0.35s ease, translate 0.35s ease, box-shadow 0.35s ease;
+  border: 1px solid rgba(11, 59, 111, 0.14);
+  background: linear-gradient(150deg, #0e4c92 0%, #0b3b6f 60%, #072b55 100%);
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+  text-align: left;
+  font: inherit;
 }
 
-.blessing-card:nth-child(3n + 1) {
-  --tilt: -1.1deg;
-  background: #fffaf0;
+.po-box:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px -12px rgba(6, 27, 51, 0.55);
 }
 
-.blessing-card:nth-child(3n + 2) {
-  --tilt: 0.9deg;
-  background: #f3f8fe;
+/* 抽屉拉开的那道缝 */
+.po-box::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 14px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(240, 200, 120, 0.55);
+  transition: transform 0.28s ease;
 }
 
-.blessing-card:nth-child(3n) {
-  --tilt: -0.6deg;
-  background: #fdf4f6;
+.po-box:hover::after {
+  transform: translateY(4px);
 }
 
-.blessing-card:hover {
-  rotate: 0deg;
-  translate: 0 -4px;
-  box-shadow: 0 22px 42px -26px rgba(6, 27, 51, 0.6);
+.po-box.is-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold) inset, 0 14px 30px -12px rgba(6, 27, 51, 0.5);
 }
 
-.blessing-text {
-  font-size: 15px;
-  line-height: 1.9;
-  color: var(--ink);
+/* 信箱编号印章 */
+.po-box-num {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 200, 120, 0.6);
+  color: var(--gold-soft);
+  font-size: 17px;
+  letter-spacing: 0;
 }
 
-.blessing-from {
-  margin-top: 16px;
+.po-box-title {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.po-box-desc {
+  margin: 0 0 14px;
   font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  text-align: right;
+  color: rgba(255, 255, 255, 0.68);
+  letter-spacing: 0.08em;
 }
 
-.blessing-note {
-  margin-top: 44px;
-  text-align: center;
-  font-size: 13px;
+.po-box-count {
+  font-size: 12px;
   letter-spacing: 0.1em;
+  color: var(--gold-soft);
+}
+
+/* ---------- 拆信台 ---------- */
+.po-desk {
+  margin-top: 26px;
+  padding: 24px;
+  border-radius: 16px;
+  background: #f6f8fb;
+  border: 1px solid var(--line);
+}
+
+.po-desk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 18px;
+  border-bottom: 1px dashed rgba(11, 59, 111, 0.18);
+}
+
+.po-desk-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.po-desk-seal {
+  width: 46px;
+  height: 46px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 2px dashed var(--gold-deep);
+  color: var(--gold-deep);
+  font-size: 18px;
+  background: #fff;
+}
+
+.po-desk-title h3 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: 0.06em;
+}
+
+.po-desk-title p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+.po-desk-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* ---------- 信件：米白信纸 ---------- */
+.po-letters {
+  margin-top: 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.po-empty {
+  padding: 34px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.po-letter {
+  background: var(--po-paper);
+  border: 1px solid var(--po-edge);
+  border-radius: 6px;
+  padding: 20px 22px 16px;
+  position: relative;
+  box-shadow: 0 6px 18px -14px rgba(6, 27, 51, 0.5);
+}
+
+/* 信封压痕 */
+.po-letter::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--po-edge) 0 10px, transparent 10px 20px);
+  opacity: 0.9;
+}
+
+.po-letter-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.po-letter-name {
+  font-weight: 700;
+  color: var(--po-ink);
+  font-size: 15px;
+}
+
+.po-letter-year {
+  font-size: 12px;
+  color: #8d7f6a;
+  letter-spacing: 0.08em;
+}
+
+.po-letter-time {
+  margin-left: auto;
+  font-size: 12px;
+  color: #a0948a;
+  letter-spacing: 0.06em;
+}
+
+/* 信纸横线 */
+.po-letter-body {
+  font-size: 15px;
+  line-height: 28px;
+  color: var(--po-ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-image: repeating-linear-gradient(
+    transparent, transparent 27px,
+    rgba(11, 59, 111, 0.07) 27px, rgba(11, 59, 111, 0.07) 28px
+  );
+  padding-bottom: 4px;
+}
+
+.po-letter-foot {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 13px;
+}
+
+.po-act {
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--blue-600);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  transition: color 0.2s ease;
+}
+
+.po-act:hover {
+  color: var(--gold-deep);
+}
+
+.po-act.is-on {
+  color: var(--gold-deep);
+  font-weight: 700;
+}
+
+/* 回复 */
+.po-replies {
+  margin-top: 14px;
+  padding-left: 16px;
+  border-left: 2px solid var(--po-edge);
+  display: grid;
+  gap: 10px;
+}
+
+.po-reply {
+  font-size: 14px;
+  line-height: 24px;
+  color: #5c5045;
+}
+
+.po-reply b {
+  color: var(--po-ink);
+  margin-right: 6px;
+}
+
+.po-reply-form {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.po-reply-form input {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+/* ---------- 按钮 ---------- */
+.po-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--blue-600);
+  background: linear-gradient(135deg, #0e4c92, #0b3b6f);
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.po-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -12px rgba(6, 27, 51, 0.7);
+}
+
+.po-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.po-btn--ghost {
+  background: #fff;
+  color: var(--blue-600);
+  border-color: rgba(11, 59, 111, 0.3);
+}
+
+.po-btn--ghost:hover {
+  color: var(--gold-deep);
+  border-color: var(--gold);
+}
+
+.po-btn--sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* ---------- 写信表单 ---------- */
+.po-form {
+  margin-top: 22px;
+}
+
+.po-form-paper {
+  background: var(--po-paper);
+  border: 1px solid var(--po-edge);
+  border-radius: 8px;
+  padding: 26px 28px;
+  box-shadow: 0 18px 40px -30px rgba(6, 27, 51, 0.6);
+  animation: po-slide-in 0.32s ease both;
+}
+
+@keyframes po-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.po-form-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--po-edge);
+}
+
+.po-form-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--po-ink);
+}
+
+.po-form-tip {
+  font-size: 12px;
+  color: #a0948a;
+  letter-spacing: 0.06em;
+}
+
+.po-form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.po-field {
+  display: block;
+  margin-bottom: 16px;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.po-field--sm {
+  flex: 0 1 160px;
+}
+
+.po-field > span {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
+.po-field input,
+.po-field textarea,
+.po-field select,
+.po-reply-form input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--po-edge);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--po-ink);
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.6;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
 
-/* ---------- 24. 留言墙：卡片留空待填 ---------- */
-.blessing-card {
-  min-height: 96px;
+.po-field textarea {
+  resize: vertical;
+}
+
+.po-field input:focus,
+.po-field textarea:focus,
+.po-field select:focus,
+.po-reply-form input:focus {
+  outline: none;
+  border-color: var(--blue-600);
+  box-shadow: 0 0 0 3px rgba(14, 76, 146, 0.12);
+}
+
+.po-warn {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #fff5e6;
+  border: 1px solid #f0c878;
+  color: #8a5a00;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.po-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.po-mode {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+}
+
+/* ---------- 纪念邮票 ---------- */
+.po-stamp-wrap {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.po-stamp-card {
+  position: relative;
+  width: 300px;
+  padding: 12px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold-deep));
+  box-shadow: 0 20px 44px -24px rgba(6, 27, 51, 0.6);
+  animation: po-stamp-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+
+/* 四边齿孔：在金色边上打白色圆点 */
+.po-stamp-card::before,
+.po-stamp-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.po-stamp-card::before {
+  background:
+    radial-gradient(circle at 5px 0, #fff 3.6px, transparent 4px) 0 0 / 13px 13px repeat-x,
+    radial-gradient(circle at 5px 13px, #fff 3.6px, transparent 4px) 0 100% / 13px 13px repeat-x;
+}
+
+.po-stamp-card::after {
+  background:
+    radial-gradient(circle at 0 5px, #fff 3.6px, transparent 4px) 0 0 / 13px 13px repeat-y,
+    radial-gradient(circle at 13px 5px, #fff 3.6px, transparent 4px) 100% 0 / 13px 13px repeat-y;
+}
+
+@keyframes po-stamp-in {
+  from { opacity: 0; transform: scale(0.86) rotate(-3deg); }
+  to   { opacity: 1; transform: none; }
+}
+
+.po-stamp-inner {
+  position: relative;
+  background: #fff;
+  padding: 20px 20px 18px;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+}
+
+.po-stamp-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed var(--po-edge);
+}
+
+.po-stamp-brand {
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--gold-deep);
+  font-weight: 700;
+}
+
+.po-stamp-box {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #8d7f6a;
+}
+
+.po-stamp-quote {
+  flex: 1;
+  margin-top: 14px;
+  font-size: 14px;
+  line-height: 26px;
+  color: var(--po-ink);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.po-stamp-foot {
+  margin-top: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.po-stamp-from {
+  font-size: 13px;
+  color: var(--po-ink);
+  font-weight: 700;
+}
+
+.po-stamp-no {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: #a0948a;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+
+/* 邮戳 */
+.po-postmark {
+  position: absolute;
+  right: 10px;
+  top: 44px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 2px dashed rgba(169, 118, 29, 0.75);
+  transform: rotate(-14deg);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--gold-deep);
+  pointer-events: none;
+}
+
+.po-postmark span {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+}
+
+.po-postmark b {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+
+.po-stamp-tip {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ---------- 小工具 ---------- */
+.hidden {
+  display: none !important;
+}
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 900px) {
+  .po-mailboxes { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .po-mailboxes { grid-template-columns: 1fr; gap: 14px; }
+  .po-desk { padding: 18px 16px; }
+  .po-desk-head { flex-direction: column; align-items: flex-start; }
+  .po-form-paper { padding: 20px 18px; }
+  .po-stamp-card { width: 100%; max-width: 300px; }
+  .po-postmark { width: 68px; height: 68px; right: 6px; }
+}
+
+/* 尊重系统的「减少动态效果」设置 */
+@media (prefers-reduced-motion: reduce) {
+  .po-box, .po-btn, .po-box::after { transition: none; }
+  .po-form-paper, .po-stamp-card { animation: none; }
 }
