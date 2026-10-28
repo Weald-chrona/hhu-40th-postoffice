@@ -167,3 +167,25 @@
   var mount = document.getElementById("sec-achievements");
   if (mount) mount.outerHTML = html;
 })();
+
+/* ---------- 学科里程碑：进入视口时轨道生长、学士帽依次点亮 ---------- */
+(function () {
+  var rail = document.querySelector(".disc-milestones");
+  if (!rail) return;
+
+  if (!("IntersectionObserver" in window)) {
+    rail.classList.add("is-in");
+    return;
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        rail.classList.add("is-in");
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  io.observe(rail);
+})();

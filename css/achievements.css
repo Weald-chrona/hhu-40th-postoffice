@@ -201,91 +201,157 @@
   background: linear-gradient(135deg, var(--blue-400), var(--gold));
 }
 
-/* ---------- 学科里程碑 ---------- */
+/* ---------- 学科里程碑：学士帽轨道 + 生长动画 ---------- */
 .disc-milestones {
   position: relative;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 14px 10px;
+  height: 248px;
   margin: 0 0 64px;
-  padding: 26px 22px 22px;
+  padding: 0 10px;
   list-style: none;
-  background: var(--white);
+  background: linear-gradient(180deg, rgba(14, 76, 146, 0.035), rgba(217, 164, 65, 0.035));
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  overflow: hidden;
 }
 
+/* 轨道：进入视口后从左向右生长 */
 .disc-milestones::before {
   content: "";
   position: absolute;
-  left: 40px;
-  right: 40px;
-  top: 60px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(14, 76, 146, 0.25), transparent);
+  left: 8%;
+  right: 8%;
+  top: 124px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    rgba(14, 76, 146, 0.08),
+    rgba(217, 164, 65, 0.55) 50%,
+    rgba(14, 76, 146, 0.08));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 3.75s cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+
+.disc-milestones.is-in::before {
+  transform: scaleX(1);
 }
 
 .disc-milestones li {
   position: relative;
-  flex: 1 1 auto;
-  min-width: 120px;
-  text-align: center;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 6px;
+}
+
+.disc-milestones li:nth-child(odd) {
+  justify-content: flex-end;
+  padding-bottom: 156px;
+}
+
+.disc-milestones li:nth-child(even) {
+  justify-content: flex-start;
+  padding-top: 156px;
+}
+
+/* 节点：学士帽图标 */
+.disc-milestones li::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 110px;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23d9a441'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2.5%208.5L12%204l9.5%204.5L12%2013%202.5%208.5z'/%3E%3Cpath%20d='M6.5%2010.8V15c0%201.7%202.5%203%205.5%203s5.5-1.3%205.5-3v-4.2'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 0 8px rgba(217, 164, 65, 0.45));
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.45s ease,
+    transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.3s ease;
+}
+
+/* 依次点亮 */
+.disc-milestones.is-in li::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.disc-milestones.is-in li:nth-child(1)::after { transition-delay: 1s; }
+.disc-milestones.is-in li:nth-child(2)::after { transition-delay: 1.55s; }
+.disc-milestones.is-in li:nth-child(3)::after { transition-delay: 2.1s; }
+.disc-milestones.is-in li:nth-child(4)::after { transition-delay: 2.65s; }
+.disc-milestones.is-in li:nth-child(5)::after { transition-delay: 3.2s; }
+.disc-milestones.is-in li:nth-child(6)::after { transition-delay: 3.75s; }
+
+.disc-milestones li:hover::after {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 14px rgba(217, 164, 65, 0.8));
 }
 
 .ms-year {
   display: block;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 900;
   letter-spacing: 0.02em;
   color: var(--blue-600);
-}
-
-.ms-year::after {
-  content: "";
-  display: block;
-  width: 7px;
-  height: 7px;
-  margin: 8px auto 12px;
-  border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.16);
+  font-variant-numeric: tabular-nums;
 }
 
 .ms-text {
   display: block;
+  margin-top: 6px;
   font-size: 12.5px;
   line-height: 1.6;
+  letter-spacing: 0.02em;
   color: var(--muted);
 }
 
-/* ---------- 响应式 ---------- */
 @media (max-width: 900px) {
-  .disc-grid {
-    grid-template-columns: 1fr;
-  }
-
   .disc-milestones {
-    justify-content: flex-start;
+    flex-direction: column;
+    height: auto;
+    padding: 24px 22px;
+    gap: 20px;
   }
 
   .disc-milestones::before {
-    display: none;
+    left: 30px;
+    right: auto;
+    top: 30px;
+    bottom: 30px;
+    width: 2px;
+    height: auto;
+    transform: scaleY(0);
+    transform-origin: top center;
+    background: linear-gradient(180deg,
+      rgba(14, 76, 146, 0.08),
+      rgba(217, 164, 65, 0.5),
+      rgba(14, 76, 146, 0.08));
   }
 
-  .disc-milestones li {
-    flex: 0 0 calc(33.333% - 10px);
-    margin-bottom: 12px;
-  }
-}
-
-@media (max-width: 560px) {
-  .disc-lead {
-    padding-left: 16px;
+  .disc-milestones.is-in::before {
+    transform: scaleY(1);
   }
 
-  .disc-milestones li {
-    flex: 0 0 calc(50% - 10px);
+  .disc-milestones li,
+  .disc-milestones li:nth-child(odd),
+  .disc-milestones li:nth-child(even) {
+    justify-content: flex-start;
+    padding: 0 0 0 44px;
+  }
+
+  .disc-milestones li::after {
+    left: 16px;
+    top: 2px;
+    margin-left: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  .ms-year {
+    font-size: 18px;
   }
 }
 
@@ -502,5 +568,11 @@
 
   .disc-facts b {
     font-size: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .disc-grid {
+    grid-template-columns: 1fr;
   }
 }
