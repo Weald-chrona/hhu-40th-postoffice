@@ -18,8 +18,10 @@
   <a class="skip-link" href="#main">跳到主要内容</a>
   <div class="progress" id="progress" aria-hidden="true"></div>
 
-  <!-- ===== 导航 ===== -->
-  <header class="nav" id="nav">
+  <!-- ===== 导航 =====
+       is-solid 直接写在标签上：删掉首页深色封面之后，导航下面是浅色板块，
+       等 JS 再加这个类会闪一下透明，白底上看不清字 -->
+  <header class="nav is-solid" id="nav">
     <div class="container nav-inner">
       <a class="brand" href="index.html" aria-label="返回首页">
         <span class="brand-mark">40</span>
@@ -30,11 +32,10 @@
       </a>
 
       <nav class="nav-links" id="navLinks" aria-label="主导航">
-        <a href="#top" data-tab="home">首页</a>
+        <a href="#blessings" data-tab="postoffice">四十号邮局</a>
         <a href="#history" data-tab="history">校史时间轴</a>
         <a href="#achievements" data-tab="achievements">学科成果</a>
         <a href="#alumni" data-tab="alumni">校友风采</a>
-        <a href="#blessings" data-tab="postoffice">四十号邮局</a>
         <a href="about.html">学院概况</a>
       </nav>
 
@@ -46,43 +47,6 @@
   </header>
 
   <main id="main">
-    <!-- ===== 主视觉（只在首页出现，切到板块后收起） ===== -->
-    <section class="hero" id="top" data-panel="home">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-overlay" aria-hidden="true"></div>
-
-      <div class="container hero-content">
-        <p class="hero-kicker">河海大学 · 信息科学与工程学院</p>
-        <h1 class="hero-title">
-          <span>四秩砺行</span>
-          <span>信领新途</span>
-        </h1>
-        <p class="hero-sub">1986 — 2026 · 四十载弦歌不辍，新征程智启未来</p>
-        <div class="hero-actions">
-          <a class="btn btn--primary" href="#history" data-tab="history">走进四秩历程</a>
-        </div>
-      </div>
-
-      <a class="scroll-hint" href="#history" data-tab="history" aria-label="浏览校史时间轴">
-        <span></span>
-      </a>
-    </section>
-
-
-    <!-- ===== 照片带（横向无缝滚动，只在首页出现） ===== -->
-    <section class="photo-strip" data-panel="home" aria-label="学院掠影照片带">
-      <div class="photo-track" id="photoTrack">
-        <figure class="photo-item"><img src="images/strip-1.jpg" alt="新生第一课：人工智能主题讲座" /></figure>
-        <figure class="photo-item"><img src="images/strip-2.jpg" alt="摄影培训讲座现场" /></figure>
-        <figure class="photo-item"><img src="images/strip-3.jpg" alt="江苏大学生创新大赛参赛团队合影" /></figure>
-        <figure class="photo-item"><img src="images/strip-4.jpg" alt="国际学术报告现场" /></figure>
-        <figure class="photo-item"><img src="images/strip-5.jpg" alt="校企合作座谈交流" /></figure>
-        <figure class="photo-item"><img src="images/strip-6.jpg" alt="学院活动掠影" /></figure>
-        <figure class="photo-item"><img src="images/strip-7.jpg" alt="学院活动掠影" /></figure>
-        <figure class="photo-item"><img src="images/strip-8.jpg" alt="学院活动掠影" /></figure>
-      </div>
-    </section>
-
     <!-- ===== 板块切换区：同一时刻只显示一个 data-panel =====
          外层 .panel 是切换开关，内层 #sec-xxx 才是 sections/*.js 注入内容的位置，
          所以 sections 里的文件不需要任何改动。 -->
@@ -119,11 +83,10 @@
       </div>
 
       <nav class="footer-links" aria-label="页脚导航">
-        <a href="#top" data-tab="home">首页</a>
+        <a href="#blessings" data-tab="postoffice">四十号邮局</a>
         <a href="#history" data-tab="history">校史时间轴</a>
         <a href="#achievements" data-tab="achievements">学科成果</a>
         <a href="#alumni" data-tab="alumni">校友风采</a>
-        <a href="#blessings" data-tab="postoffice">四十号邮局</a>
         <a href="about.html">学院概况</a>
       </nav>
 

@@ -18,3 +18,9 @@ Desktop.ini
 
 # 本项目为纯静态站点，不需要依赖目录
 node_modules/
+
+# 本地截图（验证用，不进仓库）
+shots/
+
+# 本地同屏预览外壳（验证用，不进仓库）
+preview.html

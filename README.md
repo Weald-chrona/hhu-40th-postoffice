@@ -55,6 +55,7 @@ git push
 ```
 index.html              页面骨架：导航、主视觉、页脚。基本不用改
 about.html              学院概况页
+admin.html              内容管理后台（只有管理员用，导航里不出现）
 css/
   style.css             公共样式（变量、导航、主视觉、页脚、通用区块）
   assets-inline.css     内联资源（别改）
@@ -62,6 +63,7 @@ css/
   achievements.css      ← 队友 B
   alumni.css            ← 队友 B
   postoffice.css        ← 组长
+  admin.css             后台样式（只有 admin.html 用）
   responsive.css        所有 @media 响应式规则，最后加载
 sections/
   history.js            ← 队友 A
@@ -70,8 +72,14 @@ sections/
   postoffice.js         ← 组长
 js/
   main.js               滚动动画、导航、轮播等公共交互
+  config.js             邮局配置：Supabase key、六个信箱、字数上限
+  sensitiveWords.js     屏蔽词：兜底词库 + 组合规则 + 远端词库同步
+  letters.js            邮局主逻辑：存取、渲染、写信、看信
+  admin.js              后台逻辑：登录、下架信件、管词库
 images/                 图片资源
-supabase/               数据库脚本
+supabase/
+  schema.sql            建表 + RLS + 词库种子词
+  配置步骤.md            从注册到后台能用的完整步骤
 ```
 
 `sections/*.js` 里就是各板块的 HTML，改法和改 HTML 一样，外面包了一层
@@ -93,10 +101,17 @@ supabase/               数据库脚本
 
 ### 切到真实数据库（Supabase）
 
-1. 打开 supabase.com 新建项目（免费）
+详细步骤见 `supabase/配置步骤.md`，这里是要点：
+
+1. 打开 supabase.com 新建项目（免费，区域选新加坡）
 2. 左侧 **SQL Editor** → 把 `supabase/schema.sql` 整段粘进去 → **Run**
-   这一步会建好 `letters` 表、开启 RLS 行级安全、创建点赞函数
-3. **Project Settings → API** 里复制两个值，填进 `js/config.js`：
+   这一步会建好 `letters` / `words` / `admins` 三张表、开启 RLS、创建点赞函数
+3. **Authentication → Users → Add user** 建一个管理员账号（记得勾 Auto Confirm User）
+4. 回到 SQL Editor，把这个邮箱登记成管理员：
+   ```sql
+   insert into public.admins (email) values ('你的邮箱@example.com');
+   ```
+5. **Project Settings → API** 里复制两个值，填进 `js/config.js`：
 
 ```js
 supabaseUrl: 'https://xxxxxxxx.supabase.co',   // Project URL
@@ -109,10 +124,33 @@ supabaseKey: 'eyJhbGciOi...',                  // anon public
 > ⚠️ RLS 一定要开（schema.sql 里已经开了）。anon key 会随网页发出去，
 > 任何人都能看到，没有 RLS 就等于数据库裸奔。
 
+### 内容管理后台（admin.html）
+
+配好数据库之后，打开 `admin.html`，用第四步那个邮箱密码登录。
+
+- **信件审核**：按信箱/状态筛选、搜关键词；「下架」= 从所有人页面消失但数据还在，
+  「删除」= 真删（主信会连带删掉它的回复）
+- **屏蔽词库**：加词删词，访客刷新页面生效
+
+权限不在前端判断——数据库的 RLS 只认 `admins` 表里的邮箱，
+就算有人拿到 anon key 直接调接口，改不了也删不掉。
+
+### 屏蔽词怎么工作的
+
+三层，缺一层都容易被绕：
+
+1. **兜底词库**（`sensitiveWords.js` 里的 `BASE_WORDS`）—— 前端即时拦截，断网也能用
+2. **组合规则**—— 两个字母的缩写不单拦（`Sb` 是锑元素），
+   要「缩写 + 骂的对象」同时出现才拦，比如 `sb学校`；「妈妈」「爸妈」这类词先保护起来，不误伤
+3. **后台下架**—— 前两条都漏了，管理员在 `admin.html` 里把那条撤掉
+
+词库本身存在 Supabase 的 `words` 表里，所以加词不用改代码重发。
+
 ### 自检
 
 ```bash
 node tests/po.logic.test.js
 ```
 
-12 项逻辑测试（敏感词两道防线、配置完整性）应当全部 PASS。
+25 项逻辑测试（敏感词两道防线、缩写误伤控制、配置完整性、入学年份与信箱对应）
+应当全部 PASS。
