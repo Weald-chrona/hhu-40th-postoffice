@@ -1,17 +1,36 @@
-/* ============================================================
-   四十号邮局 · 内容管理后台
-   ============================================================
-   这个页面只做三件事：
-     1. 登录（Supabase Auth 邮箱密码）
-     2. 看信 → 下架 / 恢复 / 删除
-     3. 管屏蔽词库 → 加词 / 删词
+  /* ============================================================
+     四十号邮局 · 内容管理后台
+     ============================================================
+     这个页面只做三件事：
+       1. 登录（账号是数字，后端其实还是 Supabase Auth 邮箱密码，
+          登录框里填 111，代码里自动拼成 111@admin.hhu.com）
+       2. 看信 → 下架 / 恢复 / 删除
+       3. 管屏蔽词库 → 加词 / 删词
 
-   权限不靠前端判断：页面上按钮藏得再好，拿到 anon key 的人照样能直接调接口。
-   真正的门在数据库的 RLS 里（supabase/schema.sql 第 4 节），
-   这里的 is_admin 检查只是为了让非管理员看到一句人话，而不是一片空白。
-   ============================================================ */
+     权限不靠前端判断：页面上按钮藏得再好，拿到 anon key 的人照样能直接调接口。
+     真正的门在数据库的 RLS 里（supabase/schema.sql 第 4 节），
+     这里的 is_admin 检查只是为了让非管理员看到一句人话，而不是一片空白。
+     ============================================================ */
 (function () {
   'use strict';
+
+  // 账号后缀：登录框只填数字账号，拼上它才是 Supabase 里的完整邮箱。
+  // 想换队伍风格的域名，改这一处就行（数据库 admins 表里存的是完整邮箱）。
+  var ACCOUNT_SUFFIX = '@admin.hhu.com';
+
+  // 数字账号 → 完整邮箱；直接填了完整邮箱的也认（向后兼容）。
+  function accountToEmail(v) {
+    v = String(v || '').trim();
+    if (!v) return '';
+    return v.indexOf('@') === -1 ? v + ACCOUNT_SUFFIX : v;
+  }
+
+  // 完整邮箱 → 顶栏显示用的短账号
+  function emailToAccount(email) {
+    email = String(email || '');
+    var i = email.indexOf(ACCOUNT_SUFFIX);
+    return i === -1 ? email : email.slice(0, i);
+  }
 
   var CFG = window.PO_CONFIG || {};
   var BOXES = window.PO_MAILBOXES || [];
@@ -70,7 +89,7 @@
     $('adLogin').hidden = true;
     $('adMain').hidden = false;
     $('adWho').hidden = false;
-    $('adEmail').textContent = email || '';
+    $('adEmail').textContent = '管理员 ' + emailToAccount(email);
   }
 
   function enter(session) {
@@ -105,7 +124,7 @@
       say($('adLoginMsg'), '正在登录……', true);
 
       db.auth.signInWithPassword({
-        email: $('adUser').value.trim(),
+        email: accountToEmail($('adUser').value),
         password: $('adPass').value
       }).then(function (res) {
         btn.disabled = false;

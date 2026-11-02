@@ -182,6 +182,20 @@ insert into public.words (word, note) values
 on conflict (word) do nothing;
 
 
+-- ---------- 6.5 表权限（GRANT）----------
+-- 建项目时如果勾了「Automatically expose new tables」，Supabase 会自动授权；
+-- 没勾的话，匿名访客连表都碰不到，前端会报 permission denied。
+-- 这里显式授权一遍，两种情况都能跑通。真正拦数据的是上面的 RLS，不是这里：
+-- 就算给了 anon 删表权限，没有对应 policy 也删不掉一行。
+grant select, insert, update, delete on public.letters to anon, authenticated;
+grant select on public.words to anon;
+grant select, insert, update, delete on public.words to authenticated;
+grant usage, select on sequence public.words_id_seq to anon, authenticated;
+
+-- admins 表只有数据库函数（is_admin）能读，前端角色一律收回权限
+revoke all on public.admins from anon, authenticated;
+
+
 -- ---------- 7. 验收：看一眼建好了没 ----------
 -- 跑完可以在 SQL Editor 里执行这两句检查：
 --   select count(*) from public.letters;   -- 信有多少封

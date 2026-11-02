@@ -47,7 +47,8 @@ t('正常内容不被改', m2 === '正常内容不受影响', m2);
 console.log('=== 配置完整性 ===');
 t('六个信箱', B.length === 6, B.length);
 t('信箱 id 唯一', new Set(B.map(b => b.id)).size === B.length);
-t('未填 key 时进入演示模式', !(C.supabaseUrl && C.supabaseKey));
+t('已填 Supabase key（连真实库）',
+  /^https:\/\/[a-z0-9]+\.supabase\.co$/.test(C.supabaseUrl) && C.supabaseKey.length > 20);
 t('字数上限 500', C.maxLength === 500);
 
 console.log('=== 入学年份与信箱的对应 ===');

@@ -7,11 +7,11 @@
    刷新页面就会自动切到真实数据库，不用改任何别的代码。
    ============================================================ */
 window.PO_CONFIG = {
-  // Supabase 项目地址，形如 https://xxxxxxxx.supabase.co
-  supabaseUrl: '',
+  // Supabase 项目地址（区域：东京）
+  supabaseUrl: 'https://glsxokmwacudzvrnuhtq.supabase.co',
 
-  // anon public key（一长串，以 eyJ 开头）
-  supabaseKey: '',
+  // Publishable key（公开密钥，可以放进前端；数据安全由数据库 RLS 负责）
+  supabaseKey: 'sb_publishable_Oaytp5vybQxVnRRKPsvPxw_DrOcTSN0',
 
   // 每页最多显示多少封信
   pageSize: 30,

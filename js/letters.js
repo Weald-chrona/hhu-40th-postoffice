@@ -665,11 +665,15 @@
 
       showStamp(row);
       refresh();
-      setTimeout(function () { if (state.box) openBox(state.box); }, 60);
+      // 这里不要再自动 openBox()：拆信台浮层在 DOM 里排在邮票后面，
+      // 同一层级下会画在邮票上面，把刚生成的邮票整个盖住。
+      // 想回去看自己那封信，用户点「收下，继续看信」就够了，那条路里已经带了 openBox。
     });
   }
 
   function showStamp(row) {
+    stampRow = row;
+    if (els.stampTip) els.stampTip.textContent = '右键或长按这张邮票也能保存';
     var b = boxById(row.mailbox) || { title: '', num: '' };
     var quote = row.content.length > 76 ? row.content.slice(0, 76) + '…' : row.content;
 
@@ -689,6 +693,150 @@
       '</div>';
 
     openModal(els.stampWrap);
+  }
+
+  /* ============================================================
+     4.4b 把邮票导出成 PNG
+     ------------------------------------------------------------
+     页面上那张邮票是 HTML + CSS 画的：怎么缩放都清楚，手机上也好排版。
+     但 HTML 存不成图片，所以点「保存」时按同一套版式用 canvas 再画一遍，
+     画完 toDataURL 塞给一个 <a download> 触发下载。
+     画布 600 × 380，按设备像素比放大再缩，避免高分屏上发虚。 */
+  var stampRow = null;
+
+  /** 中文折行：canvas 没有现成的换行 API，只能逐字量宽度 */
+  function wrapLines(g, text, maxWidth, maxLines) {
+    var lines = [];
+    var line = '';
+    var i;
+    for (i = 0; i < text.length; i++) {
+      var ch = text.charAt(i);
+      if (ch === '\n') { lines.push(line); line = ''; continue; }
+      if (line && g.measureText(line + ch).width > maxWidth) {
+        lines.push(line);
+        line = ch;
+        if (lines.length === maxLines) { i++; break; }   // 排满了，剩下的字塞不进去
+        continue;
+      }
+      line += ch;
+    }
+    if (line && lines.length < maxLines) lines.push(line);
+    if (i < text.length && lines.length) {               // 有字被截掉，末行补省略号
+      var last = lines[lines.length - 1];
+      lines[lines.length - 1] = last.slice(0, Math.max(0, last.length - 1)) + '…';
+    }
+    return lines;
+  }
+
+  function drawStamp(row) {
+    var W = 600, H = 380;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var c = document.createElement('canvas');
+    c.width = W * dpr;
+    c.height = H * dpr;
+    var g = c.getContext('2d');
+    if (!g) return null;
+    g.scale(dpr, dpr);
+
+    // 纸底
+    g.fillStyle = '#f5f1e8';
+    g.fillRect(0, 0, W, H);
+
+    // 齿孔：沿四条边每隔 24px 挖掉一个半径 8 的圆
+    g.fillStyle = '#fbf9f4';
+    var step = 24, x, y;
+    function punch(px, py) { g.beginPath(); g.arc(px, py, 8, 0, Math.PI * 2); g.fill(); }
+    for (x = 0; x <= W; x += step) { punch(x, 0); punch(x, H); }
+    for (y = 0; y <= H; y += step) { punch(0, y); punch(W, y); }
+
+    // 内外两道框
+    g.strokeStyle = '#1a3a6b';
+    g.lineWidth = 2;
+    g.strokeRect(24, 24, W - 48, H - 48);
+    g.globalAlpha = 0.35;
+    g.lineWidth = 1;
+    g.strokeRect(32, 32, W - 64, H - 64);
+    g.globalAlpha = 1;
+
+    var b = boxById(row.mailbox) || { title: '' };
+
+    // 抬头
+    g.fillStyle = '#1a3a6b';
+    g.font = 'bold 21px serif';
+    g.fillText('四十号邮局', 48, 66);
+
+    // 右上角：投进的那个年代
+    g.fillStyle = '#b03a2e';
+    g.font = '15px "Microsoft YaHei", sans-serif';
+    var bt = b.title || '';
+    g.fillText(bt, W - 48 - g.measureText(bt).width, 66);
+
+    g.strokeStyle = 'rgba(26, 58, 107, 0.25)';
+    g.lineWidth = 1;
+    g.beginPath(); g.moveTo(48, 82); g.lineTo(W - 48, 82); g.stroke();
+
+    // 正文：最多六行，超出以省略号结尾
+    g.fillStyle = '#2b2b2b';
+    g.font = '17px "Microsoft YaHei", sans-serif';
+    var lines = wrapLines(g, row.content || '', 400, 6);
+    for (var i = 0; i < lines.length; i++) g.fillText(lines[i], 48, 120 + i * 30);
+
+    // 面值
+    g.fillStyle = '#c8952c';
+    g.font = 'bold 56px serif';
+    g.fillText('40', W - 140, 178);
+    g.font = '12px "Microsoft YaHei", sans-serif';
+    g.fillText('周年纪念', W - 140, 200);
+
+    // 邮戳：朱红双圈
+    g.save();
+    g.globalAlpha = 0.75;
+    g.strokeStyle = '#b03a2e';
+    var cx = W - 100, cy = 292;
+    g.lineWidth = 2.5;
+    g.beginPath(); g.arc(cx, cy, 44, 0, Math.PI * 2); g.stroke();
+    g.lineWidth = 1.2;
+    g.beginPath(); g.arc(cx, cy, 36, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#b03a2e';
+    g.font = 'bold 17px serif';
+    g.textAlign = 'center';
+    g.fillText('河海', cx, cy - 4);
+    g.fillText('信息', cx, cy + 18);
+    g.restore();
+    g.textAlign = 'left';
+
+    // 落款，编号跟在后面同一行 —— 右边留给邮戳，别压上去
+    g.fillStyle = '#1a3a6b';
+    g.font = '15px "Microsoft YaHei", sans-serif';
+    var from = '—— ' + (row.author_name || '匿名') +
+               (row.grad_year ? '（' + yearText(row) + '）' : '');
+    g.fillText(from, 48, H - 52);
+    var fromW = g.measureText(from).width;
+    g.fillStyle = '#8a8578';
+    g.font = '13px "Microsoft YaHei", sans-serif';
+    g.fillText(stampNo(row.id), 48 + fromW + 18, H - 53);
+
+    return c;
+  }
+
+  function saveStamp() {
+    if (!stampRow) return;
+    function tip(msg) { if (els.stampTip) els.stampTip.textContent = msg; }
+
+    var c = drawStamp(stampRow);
+    if (!c) { tip('这个浏览器不支持导出图片，直接截图保存也一样。'); return; }
+
+    try {
+      var a = document.createElement('a');
+      a.href = c.toDataURL('image/png');
+      a.download = '四秩时光邮局-' + stampNo(stampRow.id) + '.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      tip('已经存好了，去浏览器的下载目录看看。');
+    } catch (e) {
+      tip('导出失败了，直接截图保存也一样。');
+    }
   }
 
   function toggleReplyForm(letterEl) {
@@ -810,6 +958,7 @@
       showView('read');
       if (box) openBox(box);
     });
+    document.getElementById('poStampSave').addEventListener('click', saveStamp);
     // 内容边写边查，命中不合适的词就提前把「寄出」禁掉（防抖，别每敲一个字跑一遍）
     var checkTimer = null;
     els.content.addEventListener('input', function () {
@@ -974,6 +1123,7 @@
     els.send = document.getElementById('poSend');
     els.stampWrap = document.getElementById('poStamp');
     els.stampCard = document.getElementById('poStampCard');
+    els.stampTip = document.getElementById('poStampTip');
     els.stats = document.getElementById('poStats');
     els.statsNote = document.getElementById('poStatsNote');
 

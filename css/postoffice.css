@@ -1073,6 +1073,8 @@ body.po-modal-open {
 .po-stamp-quote {
   flex: 1;
   margin-top: 14px;
+  /* 右边给邮戳留出一条道，否则正文会从邮戳底下穿过去 */
+  padding-right: 76px;
   font-size: 14px;
   line-height: 26px;
   color: var(--po-ink);
@@ -1136,6 +1138,15 @@ body.po-modal-open {
   font-size: 13px;
   color: var(--muted);
   letter-spacing: 0.08em;
+}
+
+/* 邮票浮层底部的两个按钮：保存是主行动，收下是次要 */
+.po-stamp-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+  margin-top: 6px;
 }
 
 /* ---------- 小工具 ---------- */
@@ -1250,6 +1261,8 @@ body.po-modal-open {
   .po-form-switch { font-size: 11.5px; padding: 3px 8px; }
   .po-stamp-card { width: 100%; max-width: 300px; }
   .po-postmark { width: 68px; height: 68px; right: 6px; }
+  /* 手机上两个按钮竖着排，免得挤在一行点错 */
+  .po-stamp-actions { flex-direction: column; gap: 8px; }
 }
 
 /* 尊重系统的「减少动态效果」设置 */
