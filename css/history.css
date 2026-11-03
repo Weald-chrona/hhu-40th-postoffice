@@ -1,6 +1,7 @@
 /* ============================================================
    校史时间轴 样式
    负责：校史时间轴板块的同学。
+   本次改动：卡片顶部增加影像区（16:10），图注标注年份与来源。
    ============================================================ */
 
 /* ---------- 9. 时间轴 ---------- */
@@ -60,7 +61,8 @@
 }
 
 .timeline-card {
-  padding: 30px 32px;
+  padding: 0;
+  overflow: hidden;
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -72,6 +74,42 @@
   transform: translateY(-6px);
   border-color: rgba(217, 164, 65, 0.5);
   box-shadow: var(--shadow);
+}
+
+/* ---------- 影像区 ---------- */
+.timeline-photo {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  background: #eef2f7;
+}
+
+.timeline-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.timeline-card:hover .timeline-photo img {
+  transform: scale(1.04);
+}
+
+.timeline-photo figcaption {
+  position: relative;
+  padding: 9px 20px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+  background: #f7f9fc;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- 文字区 ---------- */
+.timeline-body {
+  padding: 24px 30px 28px;
 }
 
 .timeline-year {
