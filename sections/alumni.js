@@ -14,14 +14,34 @@
           <p class="section-desc">四十年，他们从这里出发。</p>
         </div>
 
-        <div class="alumni-filter reveal" role="group" aria-label="按入学年份筛选校友">
-          <button type="button" class="is-active" data-group="all">全部</button>
-          <button type="button" data-group="g3">2020–2021 级</button>
-          <button type="button" data-group="g2">2016–2019 级</button>
-          <button type="button" data-group="g1">1999–2002 级</button>
+        <div class="alumni-toolbar reveal">
+          <div class="alumni-filter" role="group" aria-label="按入学年份筛选校友">
+            <button type="button" class="is-active" data-group="all">全部</button>
+            <button type="button" data-group="g3">2020–2021 级</button>
+            <button type="button" data-group="g2">2016–2019 级</button>
+            <button type="button" data-group="g1">1999–2002 级</button>
+          </div>
+
+          <div class="alumni-view" role="group" aria-label="切换展示方式">
+            <button type="button" class="is-active" data-view="grid" aria-pressed="true" title="卡片视图" aria-label="卡片视图">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/>
+                <rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/>
+                <rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/>
+                <rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/>
+              </svg>
+            </button>
+            <button type="button" data-view="list" aria-pressed="false" title="名录视图" aria-label="名录视图">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <div class="alumni-grid">
+        <div class="alumni-grid" id="alumniGrid" data-view="grid">
           <article class="alumni-card reveal" data-group="g3">
             <img class="alumni-avatar" src="images/alumni-1.jpg" alt="校友吴思梦" />
             <div class="alumni-body">
@@ -156,5 +176,29 @@
     });
 
     q.parentNode.insertBefore(btn, q.nextSibling);
+  });
+})();
+
+
+/* ---------- 卡片 / 名录 视图切换 ---------- */
+(function () {
+  var grid = document.getElementById("alumniGrid");
+  var box = document.querySelector(".alumni-view");
+  if (!grid || !box) return;
+
+  var buttons = box.querySelectorAll("button[data-view]");
+
+  box.addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-view]");
+    if (!btn) return;
+
+    var mode = btn.getAttribute("data-view");
+    grid.setAttribute("data-view", mode);
+
+    Array.prototype.forEach.call(buttons, function (b) {
+      var on = b === btn;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
   });
 })();

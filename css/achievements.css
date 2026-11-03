@@ -576,3 +576,23 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ---------- 去组件感：收小圆角 ---------- */
+.card,
+.disc-card,
+.platform-block,
+.team-block,
+.disc-milestones {
+  border-radius: 8px;
+}
+
+/* ---------- 数字改衬线，增加报告感 ---------- */
+.disc-facts b,
+.ms-year,
+.team-stats b {
+  font-family: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+}

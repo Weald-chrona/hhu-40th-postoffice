@@ -1,16 +1,24 @@
 /* ============================================================
-   校友风采 样式
+   校友风采 样式（双视图版）
    负责：队友 B
-   要点：人物档案式竖版卡片（大头像 132px）+ 入学年份筛选 + 简介展开
+   默认：卡片视图（三列）
+   可选：名录视图（两列横排条目，细线分隔）
    ============================================================ */
 
-/* ---------- 筛选按钮 ---------- */
+/* ---------- 工具条：筛选居中 + 视图切换靠右 ---------- */
+.alumni-toolbar {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 44px;
+}
+
 .alumni-filter {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  margin-bottom: 44px;
+  padding: 0 96px;
 }
 
 .alumni-filter button {
@@ -39,7 +47,49 @@
   font-weight: 600;
 }
 
-/* ---------- 卡片网格 ---------- */
+/* ---------- 视图切换按钮 ---------- */
+.alumni-view {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.alumni-view button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.alumni-view button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.alumni-view button:hover {
+  color: var(--ink);
+  border-color: rgba(217, 164, 65, 0.6);
+}
+
+.alumni-view button.is-active {
+  color: var(--blue-600);
+  border-color: rgba(14, 76, 146, 0.35);
+  background: rgba(14, 76, 146, 0.05);
+}
+
+/* ============================================================
+   默认：卡片视图
+   ============================================================ */
 .alumni-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -54,7 +104,7 @@
   padding: 32px 28px 28px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-radius: 8px;
   transition: transform 0.35s ease, box-shadow 0.35s ease,
     border-color 0.35s ease, background 0.35s ease;
 }
@@ -70,7 +120,6 @@
   display: none;
 }
 
-/* ---------- 大头像 ---------- */
 .alumni-avatar {
   flex: 0 0 auto;
   width: 132px;
@@ -93,24 +142,23 @@
 img.alumni-avatar {
   display: block;
   object-fit: cover;
-  object-position: center 30%;
+  object-position: center 28%;
   background: none;
-  box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.26),
-    0 18px 36px -20px rgba(6, 27, 51, 0.75);
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.28),
+    0 16px 32px -20px rgba(6, 27, 51, 0.7);
 }
 
 .alumni-card:hover img.alumni-avatar {
   transform: scale(1.03);
 }
 
-/* ---------- 文字区 ---------- */
 .alumni-body {
   width: 100%;
   min-width: 0;
 }
 
 .alumni-body h3 {
-  font-size: 20px;
+  font-size: 19px;
   letter-spacing: 0.05em;
 }
 
@@ -140,7 +188,7 @@ img.alumni-avatar {
 .alumni-quote::before {
   content: "“";
   margin-right: 2px;
-  font-size: 28px;
+  font-size: 26px;
   line-height: 0;
   vertical-align: -8px;
   color: var(--gold);
@@ -168,7 +216,99 @@ img.alumni-avatar {
   color: var(--blue-600);
 }
 
-/* ---------- 响应式 ---------- */
+/* ============================================================
+   名录视图
+   ============================================================ */
+.alumni-grid[data-view="list"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 48px;
+  row-gap: 0;
+  align-items: stretch;
+}
+
+.alumni-grid[data-view="list"] .alumni-card {
+  flex-direction: row;
+  gap: 20px;
+  padding: 26px 0 24px;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  transition: background 0.3s ease;
+}
+
+.alumni-grid[data-view="list"] .alumni-card:hover {
+  transform: none;
+  background: rgba(14, 76, 146, 0.025);
+  box-shadow: none;
+  border-color: var(--line);
+}
+
+.alumni-grid[data-view="list"] .alumni-avatar {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 0;
+  font-size: 26px;
+}
+
+.alumni-grid[data-view="list"] img.alumni-avatar {
+  box-shadow: 0 0 0 2px rgba(217, 164, 65, 0.35);
+}
+
+.alumni-grid[data-view="list"] .alumni-body h3 {
+  font-size: 17px;
+}
+
+.alumni-grid[data-view="list"] .alumni-meta {
+  margin-top: 4px;
+  padding: 0;
+  background: none;
+  font-size: 12.5px;
+}
+
+.alumni-grid[data-view="list"] .alumni-quote {
+  margin-top: 10px;
+  -webkit-line-clamp: 3;
+}
+
+.alumni-grid[data-view="list"] .alumni-quote::before {
+  font-size: 22px;
+  vertical-align: -6px;
+}
+
+.alumni-grid[data-view="list"] .alumni-more {
+  margin-top: 8px;
+  font-size: 12.5px;
+}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width: 900px) {
+  .alumni-filter {
+    padding: 0;
+    justify-content: flex-start;
+  }
+
+  .alumni-toolbar {
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .alumni-view {
+    position: static;
+    transform: none;
+    flex: 0 0 auto;
+  }
+
+  .alumni-grid[data-view="list"] {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+}
+
 @media (max-width: 560px) {
   .alumni-avatar {
     width: 104px;
@@ -179,5 +319,17 @@ img.alumni-avatar {
   .alumni-filter button {
     padding: 8px 16px;
     font-size: 13px;
+  }
+
+  .alumni-grid[data-view="list"] .alumni-card {
+    gap: 14px;
+    padding: 20px 0;
+  }
+
+  .alumni-grid[data-view="list"] .alumni-avatar {
+    flex: 0 0 62px;
+    width: 62px;
+    height: 62px;
+    font-size: 22px;
   }
 }
