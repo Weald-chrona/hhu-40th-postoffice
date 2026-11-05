@@ -636,6 +636,62 @@ button {
   text-align: right;
 }
 
+/* 专业卡片：about.html 只加载 style.css，而 .card 这一组当初随成果板块
+   拆进了 achievements.css，导致图标 svg 没有尺寸、撑满整个容器（一张卡 1200px 高）。
+   这里补一份同源规则，index.html 同时加载两份也不冲突。 */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 26px;
+}
+
+.card {
+  padding: 34px 30px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease, background 0.35s ease;
+}
+
+.section--alt .card {
+  background: var(--white);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  background: var(--white);
+  border-color: rgba(217, 164, 65, 0.45);
+  box-shadow: var(--shadow);
+}
+
+.card-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 24px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(14, 76, 146, 0.1), rgba(217, 164, 65, 0.18));
+  color: var(--blue-600);
+}
+
+.card-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.card h3 {
+  font-size: 18px;
+  letter-spacing: 0.05em;
+}
+
+.card p {
+  margin-top: 12px;
+  font-size: 14.5px;
+  color: var(--muted);
+}
+
 .milestones {
   display: grid;
   gap: 0;
