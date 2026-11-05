@@ -126,3 +126,46 @@
   var mount = document.getElementById("sec-history");
   if (mount) mount.outerHTML = html;
 })();
+
+
+/* ---------- 校史时间轴：每次切到本板块都重播淡入 ---------- */
+(function () {
+  var panel = document.querySelector('[data-panel="history"]');
+  var items = Array.prototype.slice.call(
+    document.querySelectorAll("#history .reveal")
+  );
+  if (!panel || !items.length) return;
+
+  function replay() {
+    /* 第一步：禁用过渡，把元素瞬间复位到“透明且偏移”的起点 */
+    items.forEach(function (el) {
+      el.style.transition = "none";
+      el.classList.remove("is-visible");
+    });
+
+    void panel.offsetHeight;   /* 强制回流，让浏览器确认这个起点 */
+
+    requestAnimationFrame(function () {
+      /* 第二步：恢复过渡，重新排好错落延迟 */
+      items.forEach(function (el, i) {
+        el.style.transition = "";
+        el.style.transitionDelay = Math.min(i * 0.95, 7) + "s";
+      });
+
+      requestAnimationFrame(function () {
+        /* 第三步：加回类名，动画从起点开始播 */
+        items.forEach(function (el) { el.classList.add("is-visible"); });
+      });
+    });
+  }
+
+  if ("MutationObserver" in window) {
+    new MutationObserver(function (list) {
+      list.forEach(function (m) {
+        if (m.attributeName === "class" && !panel.classList.contains("is-hidden")) {
+          replay();
+        }
+      });
+    }).observe(panel, { attributes: true, attributeFilter: ["class"] });
+  }
+})();
