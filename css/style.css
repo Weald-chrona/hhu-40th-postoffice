@@ -282,7 +282,7 @@ button {
 
 .hero--page {
   min-height: 62vh;
-  padding: calc(var(--nav-h) + 60px) 0 90px;
+  padding: calc(var(--nav-h) + 24px) 0 90px;
 }
 
 /* 照片下缘别硬切一道边：盖一层从透明到 --bg 的渐变，让图自己淡进白底。
@@ -294,7 +294,7 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 42%;
+  height: 26%;
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(
