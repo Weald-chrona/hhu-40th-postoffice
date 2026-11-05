@@ -281,8 +281,16 @@ button {
 }
 
 .hero--page {
-  min-height: 62vh;
+  /* 占满整屏，标题靠 grid 居中；手机用它的小视口高度，免得地址栏收起时跳 */
+  min-height: 100vh;
+  min-height: 100svh;
   padding: calc(var(--nav-h) + 24px) 0 90px;
+}
+
+/* 满屏后照片比原来铺得高，按原取景会露出太多深蓝天空，往下压一点把校门留住 */
+.hero--page .hero-bg {
+  background-position: center 74%;
+  transform: scale(1.12) translateY(-2%);
 }
 
 /* 照片下缘别硬切一道边：盖一层从透明到 --bg 的渐变，让图自己淡进白底。
@@ -294,14 +302,14 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 26%;
+  height: 16%;
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
     rgba(246, 248, 251, 0) 0%,
-    rgba(246, 248, 251, 0.2) 45%,
-    rgba(246, 248, 251, 0.62) 76%,
+    rgba(246, 248, 251, 0.12) 40%,
+    rgba(246, 248, 251, 0.5) 74%,
     var(--bg) 100%
   );
 }
@@ -314,12 +322,12 @@ button {
   background:
     linear-gradient(
       90deg,
-      rgba(4, 16, 30, 0.88) 0%,
-      rgba(4, 16, 30, 0.66) 38%,
-      rgba(4, 16, 30, 0.22) 72%,
-      rgba(4, 16, 30, 0.05) 100%
+      rgba(4, 16, 30, 0.84) 0%,
+      rgba(4, 16, 30, 0.58) 38%,
+      rgba(4, 16, 30, 0.16) 72%,
+      rgba(4, 16, 30, 0.02) 100%
     ),
-    linear-gradient(180deg, rgba(4, 16, 30, 0.34) 0%, rgba(4, 16, 30, 0.12) 55%, rgba(4, 16, 30, 0.42) 100%);
+    linear-gradient(180deg, rgba(4, 16, 30, 0.26) 0%, rgba(4, 16, 30, 0.08) 55%, rgba(4, 16, 30, 0.28) 100%);
 }
 
 .hero::after {
