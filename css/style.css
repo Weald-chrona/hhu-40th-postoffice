@@ -552,6 +552,12 @@ button {
   letter-spacing: 0.06em;
 }
 
+/* 中文默认可以在任意两个字之间折行，窄屏上「参赛演示作品」被拆成
+   「参赛演 / 示作品」。把这一小段绑成不可断行的整体，让它整段挪到第二行。 */
+.footer-bottom .no-break {
+  white-space: nowrap;
+}
+
 /* ---------- 14. 回到顶部 ---------- */
 .to-top {
   position: fixed;
