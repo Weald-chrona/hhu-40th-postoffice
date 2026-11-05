@@ -364,6 +364,135 @@ body.po-on-home .footer {
   color: var(--muted);
 }
 
+/* ---------- 纪念墙 ----------
+   一面深色墙，把每一封信生成的那张票贴上去。
+   墙要深：六张票的纸色明度都在 80% 上下，落在浅底上会糊成一片，
+   深蓝一衬托，纸才像纸。墙纹用两道正交的极淡细线做帆布感，
+   再加一圈内阴影当「墙面往里退」，票的投影才有落点。 */
+.po-wall {
+  margin: 36px 0 10px;
+}
+
+.po-wall-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.po-wall-kicker {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--gold-deep);
+}
+
+.po-wall-title {
+  margin: 6px 0 0;
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--blue-700);
+}
+
+.po-wall-count {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.po-wall-board {
+  /* 墙色只在这里写一次：齿孔要「挖」出墙色，靠 --st-notch 递下去 */
+  --wall: #0c2135;
+  position: relative;
+  /* 用 flex 不用 grid：信是陆陆续续寄来的，最后一排大概率填不满。
+     grid 会在右下角留一个方方正正的洞，flex + 居中让最后那排自然收在中间，
+     像一面贴到最后还没贴满的墙。 */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  /* 竖向给大一点，票是歪的，挨太近会咬到一起 */
+  gap: 18px 8px;
+  padding: 24px 18px 28px;
+  border-radius: 10px;
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(217, 164, 65, 0.12), transparent 58%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.018) 0 1px, rgba(0, 0, 0, 0) 1px 4px),
+    var(--wall);
+  box-shadow:
+    inset 0 0 80px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 18px 40px -30px rgba(6, 27, 51, 0.8);
+}
+
+/* 一张票的位置：倾斜和错位由 js 按信件 id 算好，写进三个自定义属性。
+   同一个 id 每次刷新都是同一个角度 —— 否则点个赞整墙就重贴一遍。 */
+.po-wall-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: rotate(var(--r, 0deg)) translate(var(--dx, 0), var(--dy, 0));
+  z-index: var(--z, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.po-wall-tile:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+
+/* 墙上的票按 0.4 缩小（320 → 128）。用 zoom 不用 transform：transform 会把
+   mix-blend-mode 的插画提成合成层，正片叠底的白底花稿会跑位；
+   zoom 是等比缩排版，multiply 还在原来那层里叠。
+   票在墙上还要有「贴上去」的投影，浮层里那张不需要。 */
+.po-wall-tile .po-stamp-card {
+  animation: none;
+  /* 宽度必须写死。小屏那条 .po-stamp-card{width:100%} 会把宽度交给格子的宽，
+     再被 zoom .4 折算一次，票会比格子大出一倍，整面墙往右顶出屏幕 */
+  width: 320px;
+  max-width: none;
+  zoom: 0.4;
+  /* 齿孔圆点用墙色，才像「从票边透出去」；白色会在深墙上变成一圈白芝麻 */
+  --st-notch: var(--wall, #0c2135);
+  box-shadow:
+    0 6px 14px -8px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: box-shadow 0.18s ease;
+}
+
+.po-wall-tile:hover .po-stamp-card,
+.po-wall-tile:focus-visible .po-stamp-card {
+  box-shadow:
+    0 14px 26px -10px rgba(0, 0, 0, 0.8),
+    0 0 0 2px rgba(240, 200, 120, 0.5);
+}
+
+.po-wall-empty {
+  margin: 0;
+  padding: 30px 22px;
+  border: 1px dashed var(--po-edge);
+  border-radius: 10px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* 一封都没有的时候，这块深色墙板只会变成一条空横条，收掉它，
+   只留那句「墙上还空着」 */
+.po-wall.is-empty .po-wall-board { display: none; }
+
+
 /* 写信页的信箱是「选年代」用的，选中态再明显一点 */
 .po-mailboxes--pick .po-box.is-active {
   border-color: var(--gold);
@@ -1000,21 +1129,46 @@ body.po-modal-open {
   border: 1px solid var(--po-edge);
 }
 
-.po-modal-card--stamp .po-stamp-card {
-  width: 100%;
-}
-
+/* 票卡本体：浮层里那张和墙上贴的每一张是同一个东西，
+   所以基础版式写这份，浮层只补投影和入场动画，墙只补 zoom（见上面的 .po-wall-tile） */
 .po-stamp-card {
   position: relative;
-  width: 300px;
+  display: block;   /* 墙上那张是 <span>，不显式成块的话 width/padding 全不生效 */
+  width: 320px;
   padding: 12px;
   border-radius: 4px;
-  background: linear-gradient(135deg, var(--gold-soft), var(--gold-deep));
+  /* 外框跟着这一格的识别色走，底色和字色由 js 注入的 --st-* 决定 */
+  background: var(--st-accent, var(--gold-deep));
+}
+
+.po-modal-card--stamp .po-stamp-card {
   box-shadow: 0 20px 44px -24px rgba(6, 27, 51, 0.6);
   animation: po-stamp-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
 }
 
-/* 四边齿孔：在金色边上打白色圆点 */
+/* 特别版（首日封 / 第 40 封 / 第 100 封）：整张票的框换成烫金 */
+.po-stamp-card.is-gold {
+  background: linear-gradient(135deg, #e8d29a, #c8a02a 55%, #a8871d);
+}
+
+/* 右上角的小标签，只在特别版出现 */
+.po-stamp-badge {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  z-index: 2;
+  padding: 4px 10px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: #fff;
+  background: #b03a2e;
+  border-radius: 3px;
+  transform: rotate(6deg);
+  box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.55);
+}
+
+/* 四边齿孔：在识别色边上挖圆点。默认白色（浮层底下是米色信纸），
+   墙上的票把 --st-notch 改成墙色，圆点才会像「透进去」而不是贴白点 */
 .po-stamp-card::before,
 .po-stamp-card::after {
   content: "";
@@ -1025,14 +1179,14 @@ body.po-modal-open {
 
 .po-stamp-card::before {
   background:
-    radial-gradient(circle at 5px 0, #fff 3.6px, transparent 4px) 0 0 / 13px 13px repeat-x,
-    radial-gradient(circle at 5px 13px, #fff 3.6px, transparent 4px) 0 100% / 13px 13px repeat-x;
+    radial-gradient(circle at 5px 0, var(--st-notch, #fff) 3.6px, transparent 4px) 0 0 / 13px 13px repeat-x,
+    radial-gradient(circle at 5px 13px, var(--st-notch, #fff) 3.6px, transparent 4px) 0 100% / 13px 13px repeat-x;
 }
 
 .po-stamp-card::after {
   background:
-    radial-gradient(circle at 0 5px, #fff 3.6px, transparent 4px) 0 0 / 13px 13px repeat-y,
-    radial-gradient(circle at 13px 5px, #fff 3.6px, transparent 4px) 100% 0 / 13px 13px repeat-y;
+    radial-gradient(circle at 0 5px, var(--st-notch, #fff) 3.6px, transparent 4px) 0 0 / 13px 13px repeat-y,
+    radial-gradient(circle at 13px 5px, var(--st-notch, #fff) 3.6px, transparent 4px) 100% 0 / 13px 13px repeat-y;
 }
 
 @keyframes po-stamp-in {
@@ -1040,97 +1194,308 @@ body.po-modal-open {
   to   { opacity: 1; transform: none; }
 }
 
+/* ---------- 票面本体 ----------
+   里面的元素全部按 600 × 380 的画布比例用百分比摆位，
+   canvas 导出那张用的是同一套数字（44 / 90 / 350 / 194 …），所以两边严丝合缝 */
 .po-stamp-inner {
   position: relative;
-  background: #fff;
-  padding: 20px 20px 18px;
-  min-height: 210px;
-  display: flex;
-  flex-direction: column;
+  aspect-ratio: 600 / 380;
+  /* 花稿会出血到纸边（超出票面的部分要裁掉，不然会爬到齿孔和外框上） */
+  overflow: hidden;
+  /* 纸底 + 水彩晕染：底色和整张晕染图都由 js 按这一格的配色注入 */
+  background-color: var(--st-paper, #fff);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  /* 四边压暗，和 canvas 里那圈 VIGNETTE 对齐（两处数值必须一起改）。
+     --st-age 是这张纸「旧到什么程度」：六张常用票是 1，特别版是新封、调到 0.45 */
+  box-shadow: inset 0 0 54px rgba(110, 86, 50, calc(0.22 * var(--st-age, 1)));
+}
+
+/* ---------- 纸纹 ----------
+   一块平涂的米黄，压得再深也像打印纸。真正的旧纸有两层：
+   一层抄纸留下的帘纹（斜向细道），一层纤维与杂质（细颗粒）。
+   颗粒用内联 SVG 的 feTurbulence 生成，不额外请求图片；
+   alpha 由噪声的 R 通道给、RGB 一律写 0（黑），乘上去就自动变成「这张纸自己的暗色」——
+   写死成褐色的话，落到蓝图蓝、账本绿上会是一层突兀的暖灰。
+   opacity 挂在 --st-age 上：新封的纸纤维本来就细，压到 0.45 才不会被压成一块旧卡其。 */
+.po-stamp-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: calc(0.62 * var(--st-age, 1));
+  mix-blend-mode: multiply;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.44 0 0 0 0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(101deg,
+      rgba(0, 0, 0, 0.028) 0 1px,
+      rgba(0, 0, 0, 0) 1px 6px),
+    repeating-linear-gradient(11deg,
+      rgba(255, 255, 255, 0.04) 0 1px,
+      rgba(255, 255, 255, 0) 1px 9px);
+  background-size: 200px 200px, auto, auto;
+}
+
+/* 抬头下面那道细线 */
+.po-stamp-inner::before {
+  content: "";
+  position: absolute;
+  left: 7.333%;
+  right: 7.333%;
+  top: 20.5%;
+  height: 1px;
+  background: var(--st-line, #333);
+  opacity: 0.9;
 }
 
 .po-stamp-top {
+  position: absolute;
+  left: 7.333%;
+  right: 7.333%;
+  top: 11.4%;
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  padding-bottom: 8px;
-  border-bottom: 1px dashed var(--po-edge);
-}
-
-.po-stamp-brand {
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  color: var(--gold-deep);
-  font-weight: 700;
-}
-
-.po-stamp-box {
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  color: #8d7f6a;
-}
-
-.po-stamp-quote {
-  flex: 1;
-  margin-top: 14px;
-  /* 右边给邮戳留出一条道，否则正文会从邮戳底下穿过去 */
-  padding-right: 76px;
-  font-size: 14px;
-  line-height: 26px;
-  color: var(--po-ink);
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow: hidden;
-}
-
-.po-stamp-foot {
-  margin-top: 14px;
-  display: flex;
-  align-items: flex-end;
   justify-content: space-between;
   gap: 10px;
 }
 
-.po-stamp-from {
-  font-size: 13px;
-  color: var(--po-ink);
+.po-stamp-brand {
+  font-family: Georgia, "Songti SC", "SimSun", serif;
+  font-size: 12px;
+  letter-spacing: 0.1em;
   font-weight: 700;
+  color: var(--st-ink, var(--gold-deep));
+  white-space: nowrap;
+}
+
+/* 票名后面跟的「第一辑」这类辑数 */
+.po-stamp-brand i {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  opacity: 0.62;
+  margin-left: 5px;
+}
+
+/* 右上角那行年代：用加深一档的 accent（--st-deep），
+   金色本来就淡，压在旧纸黄上等于没印。字号别动 —— 票宽 320px 对
+   canvas 的 600px，7.5px 才等于那边的 15px */
+.po-stamp-box {
+  font-size: 7.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--st-deep, #8d7f6a);
+  white-space: nowrap;
+}
+
+/* 插画框：底图是 js 生成的手绘 SVG，同一批 path 也画在导出的 PNG 里 */
+.po-stamp-art {
+  position: absolute;
+  left: 7.333%;
+  top: 23.68%;
+  width: 58.33%;
+  height: 51.05%;
+  background-color: rgba(255, 255, 255, 0.42);
+  /* 第二层是本色晕：跟 canvas 里那圈 radial 同色同位置，别让票面发白 */
+  background-image: radial-gradient(ellipse at 34% 66%, var(--st-tint, transparent), transparent 62%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border: 1px solid var(--st-line, #cfc8b4);
+}
+
+/* ---------- 有手绘花稿的票面 ----------
+   每格花稿的落位不同（js/config.js 的 artBox 按形状定），实际位置由 js 写进内联样式；
+   这里只是没注入时的兜底，所以给的是「右侧、正方形」这套中间值。
+   花稿本身是纯白底，靠 multiply 让白底消失、线条跟着纸色走。 */
+.po-stamp-card.has-art .po-stamp-art {
+  left: 49.33%;      /* 296 / 600 */
+  top: 27.37%;       /* 104 / 380 */
+  width: 44.67%;     /* 268 / 600 */
+  height: 70.53%;    /* 268 / 380：图是正方形，框也得是正方形，不然画会缩在中间 */
+  background: none;
+  border: 0;
+}
+
+.po-stamp-pic {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* 抬文字：插画一旦自己成层，multiply 就只跟透明背景混、白底会露出来，所以只动文字 */
+.po-stamp-card.has-art .po-stamp-top { z-index: 2; }
+.po-stamp-card.has-art .po-stamp-inner::before { z-index: 1; }
+
+/* 花稿放大以后，字难免被枝叶穿过几笔：一层柔光压不住，右上角那行年份和
+   底部署名就糊了。所以小字先垫一圈纸色硬边（粗一档字会泡发，只用 1px），
+   正文那行字大，留一层柔光就够。 */
+.po-stamp-card.has-art .po-stamp-quote,
+.po-stamp-card.has-art .po-stamp-foot {
+  text-shadow: 0 0 3px var(--st-paper, #fff);
+}
+
+.po-stamp-card.has-art .po-stamp-brand,
+.po-stamp-card.has-art .po-stamp-box,
+.po-stamp-card.has-art .po-stamp-value em,
+.po-stamp-card.has-art .po-stamp-no {
+  text-shadow:
+    1px 0 0 var(--st-paper, #fff),
+    -1px 0 0 var(--st-paper, #fff),
+    0 1px 0 var(--st-paper, #fff),
+    0 -1px 0 var(--st-paper, #fff),
+    0 0 4px var(--st-paper, #fff);
+}
+
+/* 正文：横排，两行，压在下半张画上 —— 跟 canvas 里 44 / 214 / 30 那套坐标对齐。
+   字要压在画上，所以带一圈纸色光晕（见 .has-art 那条） */
+.po-stamp-quote {
+  position: absolute;
+  left: 7.333%;
+  /* 正文原来贴得偏下，跟上面标题之间空出一大块。设计稿 380 高，抬 10 就是 2.63%；
+     canvas 那边第一行基线同步从 216 改成 206，两处一起改 */
+  top: 47%;
+  width: 52%;
+  margin: 0;
+  font-size: 9.4px;
+  line-height: 13.8px;
+  letter-spacing: 0.02em;
+  color: var(--st-ink, var(--po-ink));
+  opacity: 0.9;
+  overflow: hidden;
+}
+
+.po-stamp-foot {
+  position: absolute;
+  left: 7.333%;
+  right: 7.333%;
+  bottom: 11.5%;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.po-stamp-value {
+  flex: none;
+  font-family: Georgia, "Songti SC", "SimSun", serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--st-accent, var(--gold-deep));
+  letter-spacing: 0.02em;
+}
+
+.po-stamp-value em {
+  font-style: normal;
+  font-family: inherit;
+  /* 原来是 6.5px / 0.6，压在花枝上直接消失；抬到 8px 并且几乎不透明 */
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--st-ink, #8d7f6a);
+  opacity: 0.88;
+  margin-left: 4px;
+}
+
+.po-stamp-from {
+  flex: 1;
+  min-width: 0;
+  margin-left: 6px;
+  font-size: 9.4px;
+  color: var(--st-ink, var(--po-ink));
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .po-stamp-no {
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  color: #a0948a;
+  flex: none;
+  font-size: 7px;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  color: var(--st-ink, #a0948a);
+  opacity: 0.55;
   font-family: ui-monospace, Menlo, Consolas, monospace;
 }
 
-/* 邮戳 */
+/* 邮戳：朱红双圈，压在票面右上角（canvas 里圆心 506 / 116、半径 38） */
 .po-postmark {
   position: absolute;
-  right: 10px;
-  top: 44px;
-  width: 84px;
-  height: 84px;
+  left: 84.33%;
+  top: 30.53%;
+  /* 宽高都写死成等比：只给 width + aspect-ratio 的话，内容一多会被撑成椭圆 */
+  width: 12.67%;
+  height: 20%;
   border-radius: 50%;
-  border: 2px dashed rgba(169, 118, 29, 0.75);
-  transform: rotate(-14deg);
+  border: 2px solid var(--st-post, rgba(169, 118, 29, 0.75));
+  transform: translate(-50%, -50%) rotate(-12deg);
   display: grid;
   place-items: center;
   text-align: center;
-  color: var(--gold-deep);
+  /* 用 post 不用 accent：accent 是面值那种亮金，压在旧纸上当戳记太淡 */
+  color: var(--st-post, var(--gold-deep));
   pointer-events: none;
 }
 
+/* 垫在戳子底下的一层纸色。花稿正好压在这个角上，枝条穿过「智启」两个字，
+   字就糊成一团 —— 中心浓、到圈外化开，跟 canvas 里那圈 radial 同一组数值 */
+.po-postmark::before {
+  content: "";
+  position: absolute;
+  inset: -16%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    var(--st-veil, rgba(255, 255, 255, 0.5)) 0 55%,
+    var(--st-veil0, rgba(255, 255, 255, 0)) 100%);
+}
+
 .po-postmark span {
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  line-height: 1.5;
+  position: relative;
+  /* 字只有七像素，垫一层纸色柔光比描边干净（描边在这个尺寸上会糊成一坨）。
+     别再叠第二层：试过两层 1.5px，字直接泡发成一团光 */
+  text-shadow: 0 0 2px var(--st-paper, #fff);
+}
+
+/* 内圈：跟 canvas 里那道半径 31 的细圈对应 */
+.po-postmark::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.8;
+}
+
+.po-postmark span {
+  display: block;
+  font-size: 6.9px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .po-postmark b {
   display: block;
-  font-size: 12px;
-  letter-spacing: 0.14em;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 7.4px;
+  letter-spacing: 0.08em;
+}
+
+.po-postmark i {
+  display: block;
+  font-style: normal;
+  /* 日期 10 个字符，3.5px 就顶到圈外了，收到 3px 且不留字距 */
+  font-size: 3px;
+  letter-spacing: 0;
+  opacity: 0.7;
+  margin-top: 1px;
 }
 
 .po-stamp-tip {
@@ -1259,8 +1624,9 @@ body.po-modal-open {
   .po-form-head { flex-wrap: wrap; gap: 8px 12px; }
   .po-form-picked-title { font-size: 15px; }
   .po-form-switch { font-size: 11.5px; padding: 3px 8px; }
-  .po-stamp-card { width: 100%; max-width: 300px; }
-  .po-postmark { width: 68px; height: 68px; right: 6px; }
+  .po-stamp-card { width: 100%; max-width: 340px; }
+  /* 新版式是整块等比缩的：宽度定了，里面的插画和横排正文自己跟着缩 */
+  .po-stamp-quote { font-size: 10px; line-height: 14.7px; }
   /* 手机上两个按钮竖着排，免得挤在一行点错 */
   .po-stamp-actions { flex-direction: column; gap: 8px; }
 }

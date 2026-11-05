@@ -73,6 +73,24 @@
             <p class="po-page-desc">或在当下，或已遥远，写下一封信，寄往来时归途。</p>
           </div>
 
+          <!-- ---------- 纪念墙 ----------
+               每一封寄到这里的信，都会生成一张邮票贴在这面墙上——
+               墙本身不做任何交互，点某一张才打开那张票（浮层复用写信后的那张）。
+               票只贴主信，回信不占墙上的位置（跟 stampRank 的口径一致）。
+               贴法见 js/letters.js 的 renderWall()：倾斜和错位按信件 id 定死，
+               同一个 id 每次刷新都贴在同一个角度，不会一刷新就满墙乱跳。 -->
+          <section class="po-wall reveal" id="poWall">
+            <div class="po-wall-head">
+              <div>
+                <span class="po-wall-kicker">四十号邮局 · 纪念墙</span>
+                <h3 class="po-wall-title">每一封信，都在墙上留一张票</h3>
+              </div>
+              <span class="po-wall-count" id="poWallCount"></span>
+            </div>
+            <div class="po-wall-board" data-po-wall></div>
+            <p class="po-wall-empty hidden" id="poWallEmpty">墙上还空着。第一个寄信的人，第一张票就是他的。</p>
+          </section>
+
           <!-- 动态统计：数字由 js/letters.js 按真实来信算，进这一页时重新滚一次 -->
           <div class="po-stats reveal" id="poStats">
             <div class="po-stat">
