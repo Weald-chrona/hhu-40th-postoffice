@@ -10,7 +10,368 @@
   --po-paper: #fbf6ec;   /* 信纸米白 */
   --po-edge: #e3d7c2;    /* 信纸压痕 */
   --po-ink: #4a4036;     /* 墨色 */
+  /* 手绘稿原图纸底是 #eeebda，但 .po-hero-art 上有 contrast(1.06)，
+     渲染出来实际是 #f5f2e0 左右 —— 底色要取「渲染后」的值，
+     否则图和底色之间（尤其手绘块下沿）会露出一道横的色差。 */
+  --po-sketch: #f5f2e0;
 }
+
+/* ---------- 板块抬头：手绘线稿整块铺满 ----------
+   图是 images/po-head-sketch.jpg（1920×1349，比例 1.42:1），纸底 #eeebda。
+   整块铺满视口宽度、贴住导航，图靠左按高度缩放，文字排在右侧那片留白里。
+   换图注意两件事：比例保持在 1.42:1 左右；纸底不是 #eeebda 就同步改 :root 里的 --po-sketch。 */
+.po-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* 高度锁死一屏：主页就是一张封面，不给上下滚动的余地。
+     窗口特别矮时交给 min-height 兜底，免得文字被裁 */
+  height: 100vh;
+  height: 100dvh;
+  min-height: 560px;
+  overflow: hidden;
+  background: var(--po-sketch);
+
+  /* .section 的 118px 上内边距整个吃掉，米色块才能从导航下沿开始；
+     再补回导航高度，否则顶部的手写字会被 fixed 导航压住 */
+  margin-top: -118px;
+  padding-top: var(--nav-h);
+  /* 突破 .container 撑满整个视口 */
+  margin-inline: calc(50% - 50vw);
+  margin-bottom: 56px;
+}
+
+.po-hero-art {
+  position: absolute;
+  top: var(--nav-h);
+  right: auto;
+  bottom: 0;
+  left: 0;
+  width: 70%;
+  background: url("../images/po-head-sketch.jpg") no-repeat left center / auto 100%;
+  pointer-events: none;
+  filter: contrast(1.06);
+  -webkit-mask-image: linear-gradient(to right, #000 72%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 72%, transparent 100%);
+}
+
+.po-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.po-hero-text {
+  width: 45%;
+  max-width: 550px;
+  padding: 56px 0;
+  text-align: left;
+}
+
+/* 标题上方那道朱红短线 */
+.po-hero-text::before {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 3px;
+  margin-bottom: 22px;
+  border-radius: 2px;
+  background: #ad4a37;
+}
+
+.po-hero-kicker {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(11, 59, 111, 0.42);
+}
+
+.po-hero-dept {
+  margin: 14px 0 0;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: #3f5b7d;
+}
+
+.po-hero-years {
+  margin: 4px 0 0;
+  font-size: 12px;
+  letter-spacing: 1.6px;
+  color: var(--muted);
+}
+
+.po-hero-title {
+  margin: 26px 0 0;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 1.5px;
+  color: var(--blue-700);
+}
+
+.po-hero-desc {
+  margin: 16px 0 0;
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: #5a6b80;
+}
+
+.po-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.po-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 26px;
+  border-radius: 8px;
+  border: 1px solid var(--blue-700);
+  background: var(--blue-700);
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.po-hero-btn:hover {
+  background: var(--blue-600);
+  border-color: var(--blue-600);
+}
+
+.po-hero-btn--ghost {
+  background: transparent;
+  color: var(--blue-700);
+}
+
+.po-hero-btn--ghost:hover {
+  background: rgba(11, 59, 111, 0.07);
+  border-color: var(--blue-700);
+}
+
+/* ---------- 板块内分页：主页 / 写信 / 看信 ----------
+   三页同时存在，letters.js 的 showView() 靠 .hidden 切换。
+   主页只有手绘块，所以要把下面那段内边距也一起抹掉，别留一条白边。 */
+#blessings[data-po-view="home"] {
+  /* 主页就是一张封面：高度锁死视口，滚轮没有可滚的东西 */
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 560px;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+  background: var(--po-sketch);
+}
+
+/* 手绘块绝对铺满整个板块 —— 不再靠负 margin 去抵 section 的内边距，
+   任何一层 padding / margin 变动都不会把它挤出视口 */
+#blessings[data-po-view="home"] .po-hero {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+}
+
+/* 整屏块不做上下位移：否则入场那一瞬底部会露出底色 */
+#blessings[data-po-view="home"] .po-hero.reveal {
+  transform: none;
+}
+
+/* 主页不显示页脚，整页就是那一张手绘稿。
+   body 上的 po-on-home 由 js/letters.js 的 updateFooter() 维护，
+   切到别的板块 / 写信页 / 看信页会自动去掉。 */
+body.po-on-home .footer {
+  display: none;
+}
+
+/* 子页页头：左边一道金色短线，回到首页的链接放在最上面 */
+/* ---------- 看信页顶部的动态统计 ----------
+   四个数字由 js/letters.js 从真实来信里数出来，进这一页时从 0 滚上去。
+   做成一张信纸色的小卡片，跟下面深蓝色的信箱卡片区分开。 */
+.po-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 0 14px;
+  padding: 24px 6px;
+  background: var(--po-paper);
+  border: 1px solid var(--po-edge);
+  border-radius: 14px;
+}
+
+.po-stat {
+  padding: 0 12px;
+  text-align: center;
+  border-right: 1px dashed var(--po-edge);
+}
+
+.po-stat:last-child { border-right: none; }
+
+.po-stat-num {
+  display: block;
+  font-size: clamp(26px, 3.2vw, 38px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--blue-700);
+  font-variant-numeric: tabular-nums;
+}
+
+.po-stat-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+
+/* 小结：哪个人来信最多，每次刷新都可能换一句
+   下面紧跟着「我也想写一封信」那条，所以间距收小一点 */
+.po-stats-note {
+  margin: 0 0 18px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ---------- 看信页：往「写下我的故事」去的入口 ----------
+   读别人的信读到一半最容易冒出「我也想写」，所以放在统计下面、信箱上面，
+   一进这一页就能看见，不用先点开信箱。 */
+.po-cta {
+  margin: 0 0 40px;
+  padding: 22px 18px 24px;
+  text-align: center;
+  border: 1px dashed var(--po-edge);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.po-cta-text {
+  margin: 0 0 14px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--blue-700);
+}
+
+.po-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 30px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0e4c92, #0b3b6f);
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  box-shadow: 0 10px 22px -14px rgba(6, 27, 51, 0.9);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.po-cta-btn:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  box-shadow: 0 14px 26px -12px rgba(6, 27, 51, 0.95);
+}
+
+.po-cta-note {
+  display: block;
+  margin-top: 12px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* 写信页那条是「退路」不是主行动，别跟「挑一个十年」抢视线：
+   去掉外框和底色，只留一颗描边按钮 */
+.po-cta--soft {
+  margin: 26px 0 40px;
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.po-cta-btn--ghost {
+  background: #fff;
+  color: var(--blue-600);
+  border: 1px solid rgba(11, 59, 111, 0.3);
+  box-shadow: none;
+}
+
+.po-cta-btn--ghost:hover {
+  color: var(--gold-deep);
+  border-color: var(--gold);
+  box-shadow: 0 10px 20px -14px rgba(6, 27, 51, 0.8);
+}
+
+.po-page-head {
+  max-width: 720px;
+  margin: 0 0 44px;
+}
+
+.po-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.po-back:hover {
+  color: var(--blue-700);
+}
+
+.po-page-kicker {
+  display: block;
+  margin-top: 28px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--gold-deep);
+}
+
+.po-page-title {
+  margin: 12px 0 0;
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--blue-700);
+}
+
+.po-page-title::after {
+  content: "";
+  display: block;
+  width: 44px;
+  height: 3px;
+  margin-top: 18px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-soft));
+}
+
+.po-page-desc {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* 写信页的信箱是「选年代」用的，选中态再明显一点 */
+.po-mailboxes--pick .po-box.is-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(196, 160, 92, 0.45);
+}
+
+/* 导航是 fixed 的，锚点跳过来会被压住一截，留出避让空间 */
+#poDesk { scroll-margin-top: calc(var(--nav-h) + 24px); }
 
 /* ---------- 六个信箱：抽屉墙 ---------- */
 .po-mailboxes {
@@ -96,11 +457,14 @@
   color: var(--gold-soft);
 }
 
-/* ---------- 拆信台 ---------- */
-.po-desk {
-  margin-top: 26px;
-  padding: 24px;
-  border-radius: 16px;
+/* ---------- 拆信台（浮层） ----------
+   2026-11-01 从页面流搬进浮层：原来跟在六格信箱下面展开，会把整页往下推一截，
+   空信箱时底下只剩一句「还没有信」，很占地方。现在是点信箱后盖上来的一层卡片，
+   信多时在卡片内部滚，页面本身不动。 */
+.po-modal-card--desk {
+  width: min(720px, 100%);
+  padding: 26px 26px 22px;
+  border-radius: 14px;
   background: #f6f8fb;
   border: 1px solid var(--line);
 }
@@ -334,11 +698,89 @@
   font-size: 13px;
 }
 
-/* ---------- 写信表单 ---------- */
-.po-form {
-  margin-top: 22px;
+/* ---------- 写信浮层 ----------
+   点信箱后从屏幕中间弹出来，盖住整页（含固定导航），像登录框。
+   页面本身不滚动，卡片内部超高时才自己滚。 */
+.po-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 960;            /* 导航是 900，浮层要压住它 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
 }
 
+.po-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 16, 30, 0.62);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: po-fade-in 0.22s ease both;
+}
+
+.po-modal-card {
+  position: relative;
+  width: min(660px, 100%);
+  max-height: calc(100vh - 56px);
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
+  border-radius: 14px;
+  box-shadow: 0 40px 90px -40px rgba(6, 27, 51, 0.85);
+  animation: po-modal-in 0.26s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+/* 卡片右上角的关闭 */
+.po-modal-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(74, 64, 54, 0.08);
+  color: var(--po-ink);
+  font-family: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.po-modal-x:hover {
+  background: rgba(74, 64, 54, 0.18);
+}
+
+.po-modal-kicker {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: #a0948a;
+}
+
+@keyframes po-modal-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes po-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* 浮层开着时底下的页面别跟着滚 */
+body.po-modal-open {
+  overflow: hidden;
+}
+
+/* ---------- 写信表单 ---------- */
 .po-form-paper {
   background: var(--po-paper);
   border: 1px solid var(--po-edge);
@@ -348,6 +790,14 @@
   animation: po-slide-in 0.32s ease both;
 }
 
+/* 浮层里的纸就是卡片本体，动画交给 .po-modal-card，别叠两层 */
+.po-modal-card .po-form-paper {
+  border-radius: 14px;
+  padding: 28px 30px 24px;
+  box-shadow: none;
+  animation: none;
+}
+
 @keyframes po-slide-in {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: none; }
@@ -355,11 +805,94 @@
 
 .po-form-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 18px;
   padding-bottom: 12px;
   border-bottom: 1px dashed var(--po-edge);
+}
+
+/* 信头：选了哪个年代 + 换一个 */
+.po-form-picked {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.po-form-seal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid #ad4a37;
+  color: #ad4a37;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.po-form-picked-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--po-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.po-form-switch {
+  flex: none;
+  padding: 3px 10px;
+  border: 1px solid var(--po-edge);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.po-form-switch:hover {
+  color: var(--gold-deep);
+  border-color: var(--gold);
+}
+
+/* 必填标记 */
+.po-req {
+  margin-left: 6px;
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  color: #ad4a37;
+}
+
+/* 还差哪几项 / 可以投递了 */
+.po-hint {
+  margin: 12px 0 0;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: #a0948a;
+}
+
+.po-hint:empty {
+  display: none;
+}
+
+.po-hint.is-ok {
+  color: #2f7d5d;
+}
+
+/* 内容里有不合适的表达：跟绿色「可以寄出」区分开，但不做成报错红块，
+   毕竟这里只是提醒改一改，不是出了错 */
+.po-hint.is-bad {
+  color: #ad4a37;
 }
 
 .po-form-title {
@@ -370,6 +903,7 @@
 }
 
 .po-form-tip {
+  margin-left: auto;   /* 小屏折行后贴右边，别孤零零落在行首 */
   font-size: 12px;
   color: #a0948a;
   letter-spacing: 0.06em;
@@ -454,12 +988,20 @@
 }
 
 /* ---------- 纪念邮票 ---------- */
-.po-stamp-wrap {
-  margin-top: 24px;
+/* 邮票也是浮层：卡片本身铺纸色，内容居中竖排 */
+.po-modal-card--stamp {
+  width: min(380px, 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
+  padding: 34px 26px 26px;
+  background: var(--po-paper);
+  border: 1px solid var(--po-edge);
+}
+
+.po-modal-card--stamp .po-stamp-card {
+  width: 100%;
 }
 
 .po-stamp-card {
@@ -531,6 +1073,8 @@
 .po-stamp-quote {
   flex: 1;
   margin-top: 14px;
+  /* 右边给邮戳留出一条道，否则正文会从邮戳底下穿过去 */
+  padding-right: 76px;
   font-size: 14px;
   line-height: 26px;
   color: var(--po-ink);
@@ -596,6 +1140,15 @@
   letter-spacing: 0.08em;
 }
 
+/* 邮票浮层底部的两个按钮：保存是主行动，收下是次要 */
+.po-stamp-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+  margin-top: 6px;
+}
+
 /* ---------- 小工具 ---------- */
 .hidden {
   display: none !important;
@@ -604,19 +1157,117 @@
 /* ---------- 响应式 ---------- */
 @media (max-width: 900px) {
   .po-mailboxes { grid-template-columns: repeat(2, 1fr); }
+
+  /* 手机上内容必然比一屏长，首页也放开高度、回到正常文档流 */
+  #blessings[data-po-view="home"] {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  #blessings[data-po-view="home"] .po-hero {
+    position: static;
+    height: auto;
+    /* section 上内边距已经是 0，不用再靠负 margin 抵消 */
+    margin: 0 0 32px;
+  }
+
+  /* 抬头改成上图下文：图在上、文字在下，都收进容器里 */
+  .po-hero {
+    display: block;
+    /* 手机上内容必然比一屏高，不能锁高度 */
+    height: auto;
+    min-height: 0;
+    margin-top: -80px;
+    margin-bottom: 40px;
+    padding-top: var(--nav-h);
+  }
+  /* 图放宽到 130% 把右侧空白挤出容器，高度按比例自适应，
+     避免固定高度把手写字裁掉 */
+  .po-hero-art {
+    position: static;
+    width: 100%;
+    height: auto;
+    /* 图宽放到 130%、高度按 1.42:1 算，容器比例跟着给 —— 两边一起改才不会
+       裁掉下半张（原图 1920×1349，手绘主体在左侧 65%，右侧是留白） */
+    aspect-ratio: 1.09;
+    background-size: 130% auto;
+    background-position: left center;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .po-hero-inner {
+    display: block;
+  }
+  .po-hero-text {
+    width: 100%;
+    max-width: none;
+    padding: 28px 0 8px;
+  }
+  .po-hero-title { font-size: 26px; letter-spacing: 1px; }
+  .po-hero-text::before { margin-bottom: 18px; }
+  .po-hero-actions { margin-top: 22px; }
+  .po-hero-btn { padding: 12px 22px; font-size: 13.5px; }
+
+  /* 子页页头收窄一点，手机上别占掉半屏 */
+  .po-page-head { margin-bottom: 28px; }
+  .po-page-kicker { margin-top: 20px; }
+  .po-page-desc { font-size: 14px; }
 }
 
 @media (max-width: 560px) {
   .po-mailboxes { grid-template-columns: 1fr; gap: 14px; }
-  .po-desk { padding: 18px 16px; }
+
+  /* 三项在手机上仍排一行，只把字号和间距压一压 */
+  .po-stats { padding: 18px 2px; }
+  .po-stat { padding: 0 6px; }
+  .po-stat-num { font-size: 24px; }
+  .po-stat-label { margin-top: 6px; font-size: 11px; letter-spacing: 0.05em; }
+  .po-stats-note { margin-bottom: 14px; }
+  .po-cta { margin-bottom: 28px; padding: 18px 14px 20px; }
+  /* 写信页那条退路在手机上同样不要框 */
+  .po-cta--soft { margin-bottom: 28px; padding: 0; }
+  .po-cta-text { margin-bottom: 12px; font-size: 14px; }
+  .po-cta-btn { padding: 11px 24px; font-size: 14px; letter-spacing: 0.06em; }
+
+  /* 写信页那组信箱是「选年代」用的，排两列、去掉描述和编号印章，
+     否则六张卡片竖着排会把信纸挤到两屏以外 */
+  .po-mailboxes--pick { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .po-mailboxes--pick .po-box { padding: 16px 14px 18px; }
+  .po-mailboxes--pick .po-box-title {
+    margin-bottom: 10px;
+    font-size: 12.5px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  .po-mailboxes--pick .po-box-desc,
+  .po-mailboxes--pick .po-box-num { display: none; }
+  .po-mailboxes--pick .po-box-count { font-size: 11px; }
+
+  .po-modal-card--desk { padding: 20px 16px 16px; }
   .po-desk-head { flex-direction: column; align-items: flex-start; }
+
+  /* 浮层在小屏上贴着边，卡片自己滚 */
+  .po-modal { padding: 12px; }
+  .po-modal-card { max-height: calc(100vh - 24px); max-height: calc(100dvh - 24px); }
+  .po-modal-card .po-form-paper { padding: 24px 18px 20px; }
+  .po-modal-card--stamp { padding: 30px 18px 22px; }
+  .po-modal-kicker { font-size: 11.5px; }
+  .po-modal-x { top: 10px; right: 10px; width: 28px; height: 28px; font-size: 18px; }
+
   .po-form-paper { padding: 20px 18px; }
+  /* 字窄了，信头一行放不下印章 + 年代 + 换一个 + 字数，允许折行 */
+  .po-form-head { flex-wrap: wrap; gap: 8px 12px; }
+  .po-form-picked-title { font-size: 15px; }
+  .po-form-switch { font-size: 11.5px; padding: 3px 8px; }
   .po-stamp-card { width: 100%; max-width: 300px; }
   .po-postmark { width: 68px; height: 68px; right: 6px; }
+  /* 手机上两个按钮竖着排，免得挤在一行点错 */
+  .po-stamp-actions { flex-direction: column; gap: 8px; }
 }
 
 /* 尊重系统的「减少动态效果」设置 */
 @media (prefers-reduced-motion: reduce) {
   .po-box, .po-btn, .po-box::after { transition: none; }
-  .po-form-paper, .po-stamp-card { animation: none; }
+  .po-form-paper, .po-stamp-card,
+  .po-modal-card, .po-modal-backdrop { animation: none; }
 }

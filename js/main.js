@@ -276,7 +276,6 @@
   var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   var HASH_BY_TAB = {
-    home: "#top",
     history: "#history",
     achievements: "#achievements",
     alumni: "#alumni",
@@ -284,7 +283,6 @@
   };
 
   var TAB_BY_HASH = {
-    "#top": "home",
     "#history": "history",
     "#achievements": "achievements",
     "#alumni": "alumni",
@@ -346,7 +344,7 @@
   }
 
   function show(name, pushHash) {
-    if (!HASH_BY_TAB[name]) name = "home";
+    if (!HASH_BY_TAB[name]) name = "postoffice";
     if (name === current) return;
     current = name;
 
@@ -366,7 +364,7 @@
     });
 
     // 首页封面是深色大图，导航透明才好看；切到板块后要变实心，否则白底上看不清
-    if (nav) nav.classList.toggle("is-solid", name !== "home");
+    if (nav) nav.classList.add("is-solid");
 
     window.scrollTo(0, 0);
 
@@ -398,10 +396,10 @@
   });
 
   window.addEventListener("popstate", function () {
-    var tab = TAB_BY_HASH[location.hash] || "home";
+    var tab = TAB_BY_HASH[location.hash] || "postoffice";
     if (tab !== current) show(tab, false);
   });
 
   // 首次进入：地址栏带 #history 就直接打开那个板块
-  show(TAB_BY_HASH[location.hash] || "home", false);
+  show(TAB_BY_HASH[location.hash] || "postoffice", false);
 })();

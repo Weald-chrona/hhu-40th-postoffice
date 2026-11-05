@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>四十号邮局 · 内容管理</title>
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- ============ 顶栏 ============ -->
+  <header class="ad-top">
+    <div class="ad-inner">
+      <span class="ad-brand">
+        <b>40</b>
+        四十号邮局 · 内容管理
+      </span>
+      <div class="ad-who" id="adWho" hidden>
+        <span id="adEmail"></span>
+        <button class="ad-btn ad-btn--ghost" id="adLogout" type="button">退出</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ 登录 ============ -->
+  <section class="ad-login" id="adLogin">
+    <form class="ad-login-card" id="adLoginForm">
+      <h1>管理员登录</h1>
+      <p class="ad-sub">账号和密码在建库时设置，只在队内流传。这个页面不对外公开。</p>
+
+      <label class="ad-field">
+        <span>管理员账号</span>
+        <input id="adUser" type="text" inputmode="numeric" placeholder="如 111" autocomplete="username" required />
+      </label>
+
+      <label class="ad-field">
+        <span>密码</span>
+        <input id="adPass" type="password" autocomplete="current-password" required />
+      </label>
+
+      <button class="ad-btn ad-btn--main" id="adLoginBtn" type="submit">登录</button>
+      <p class="ad-msg" id="adLoginMsg" role="status"></p>
+    </form>
+  </section>
+
+  <!-- ============ 主体 ============ -->
+  <main class="ad-main" id="adMain" hidden>
+
+    <nav class="ad-tabs" id="adTabs">
+      <button class="ad-tab is-on" type="button" data-tab="letters">信件审核</button>
+      <button class="ad-tab" type="button" data-tab="words">屏蔽词库</button>
+    </nav>
+
+    <!-- ---------- 信件 ---------- -->
+    <section data-pane="letters">
+      <div class="ad-filter">
+        <label class="ad-field ad-field--inline">
+          <span>信箱</span>
+          <select id="adBox"><option value="">全部</option></select>
+        </label>
+
+        <label class="ad-field ad-field--inline">
+          <span>状态</span>
+          <select id="adStatus">
+            <option value="">全部</option>
+            <option value="ok">正常展示</option>
+            <option value="hidden">已下架</option>
+          </select>
+        </label>
+
+        <label class="ad-field ad-field--grow">
+          <span>搜索</span>
+          <input id="adSearch" type="search" placeholder="署名或内容里的词" />
+        </label>
+
+        <button class="ad-btn ad-btn--ghost" id="adReload" type="button">刷新</button>
+      </div>
+
+      <p class="ad-note" id="adCount">正在加载……</p>
+      <div class="ad-list" id="adList"></div>
+    </section>
+
+    <!-- ---------- 词库 ---------- -->
+    <section data-pane="words" hidden>
+      <p class="ad-note">
+        这里加的词会立刻用于前端的即时拦截（访客刷新页面生效）。
+        两个字母的缩写（sb、nmsl）建议直接加，但要注意误伤 ——
+        系统内置了「缩写 + 骂的对象」的组合规则，以及「妈妈」「爸妈」这类保护词。
+      </p>
+
+      <form class="ad-word-form" id="adWordForm">
+        <input id="adWordInput" type="text" maxlength="40" placeholder="要屏蔽的词，比如：某培训机构" required />
+        <input id="adWordNote" type="text" maxlength="40" placeholder="备注（可空）：广告 / 辱骂 / 违规" />
+        <button class="ad-btn ad-btn--main" type="submit">添加</button>
+      </form>
+
+      <p class="ad-msg" id="adWordMsg" role="status"></p>
+      <div class="ad-words" id="adWordList"></div>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
