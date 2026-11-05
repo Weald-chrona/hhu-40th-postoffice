@@ -333,3 +333,32 @@ img.alumni-avatar {
     font-size: 22px;
   }
 }
+
+/* =========================================================
+   本板块：加强的淡入效果（每次切到本板块重播）
+   ========================================================= */
+#alumni .reveal {
+  opacity: 0;
+  transform: translateY(-56px);
+  transition: opacity 2s cubic-bezier(0.37, 0, 0.63, 1),
+    transform 2.4s cubic-bezier(0.37, 0, 0.63, 1);
+}
+
+#alumni .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* 依次浮现的间隔 */
+#alumni .reveal:nth-child(1) { transition-delay: 0.0s; }
+#alumni .reveal:nth-child(2) { transition-delay: 0.17s; }
+#alumni .reveal:nth-child(3) { transition-delay: 0.34s; }
+#alumni .reveal:nth-child(4) { transition-delay: 0.51s; }
+#alumni .reveal:nth-child(5) { transition-delay: 0.68s; }
+#alumni .reveal:nth-child(6) { transition-delay: 0.85s; }
+#alumni .reveal:nth-child(7) { transition-delay: 1.02s; }
+#alumni .reveal:nth-child(8) { transition-delay: 1.19s; }
+#alumni .reveal:nth-child(9) { transition-delay: 1.36s; }
+#alumni .reveal:nth-child(10) { transition-delay: 1.53s; }
+
+

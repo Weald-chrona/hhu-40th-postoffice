@@ -74,7 +74,7 @@
   /* ---------- 4. 滚动入场 ---------- */
   var revealItems = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
 
-  if ("IntersectionObserver" in window && !reduceMotion) {
+  if ("IntersectionObserver" in window) {
     var revealObserver = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
@@ -93,7 +93,7 @@
         function (c) { return c.classList.contains("reveal"); }
       );
       var i = siblings.indexOf(el);
-      if (i > 0) el.style.transitionDelay = Math.min(i * 0.09, 0.45) + "s";
+      if (i > 0) el.style.transitionDelay = Math.min(i * 0.14, 0.7) + "s";
       revealObserver.observe(el);
     });
   } else {
@@ -305,7 +305,7 @@
 
     items.forEach(function (el, i) {
       el.classList.remove("is-visible");
-      el.style.transitionDelay = Math.min(i * 0.07, 0.5) + "s";
+      el.style.transitionDelay = Math.min(i * 0.13, 0.7) + "s";
     });
 
     void scope.offsetHeight;
@@ -353,7 +353,13 @@
     panels.forEach(function (p) {
       var on = p.getAttribute("data-panel") === name;
       p.classList.toggle("is-hidden", !on);
-      if (on) shown.push(p);
+      if (on) {
+        /* 强制重启动画：先移除类、强制回流，再加回来 */
+        p.classList.remove("is-entering");
+        void p.offsetHeight;
+        p.classList.add("is-entering");
+        shown.push(p);
+      }
     });
 
     links.forEach(function (a) {

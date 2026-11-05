@@ -596,3 +596,118 @@
   letter-spacing: 0;
   font-variant-numeric: lining-nums tabular-nums;
 }
+
+/* =========================================================
+   学科成果：区块左右交错滑入 + 淡入
+   ========================================================= */
+.slide-left,
+.slide-right {
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.slide-left {
+  transform: translateX(-340px) scale(0.9);
+}
+
+.slide-right {
+  transform: translateX(340px) scale(0.9);
+}
+
+.slide-left.is-slid {
+  animation: slideInLeft 2.6s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+.slide-right.is-slid {
+  animation: slideInRight 2.6s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation-delay: 0.08s;
+}
+
+/* 前 45% 完成淡入，之后继续滑动到位 */
+@keyframes slideInLeft {
+  0%   { opacity: 0; transform: translateX(-340px) scale(0.9); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes slideInRight {
+  0%   { opacity: 0; transform: translateX(340px) scale(0.9); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+
+
+@media (max-width: 900px) {
+  .slide-left,
+  .slide-right {
+    transform: translateY(36px) scale(1);
+  }
+
+  @keyframes slideInLeft {
+    0%   { opacity: 0; transform: translateY(36px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+  }
+
+  @keyframes slideInRight {
+    0%   { opacity: 0; transform: translateY(36px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+  }
+}
+
+/* =========================================================
+   学科成果：整块 + 标题区的整体入场
+   ========================================================= */
+#achievements.is-sec-in .container {
+  animation: secIn 2.4s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+@keyframes secIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: none; }
+}
+
+#achievements .section-kicker,
+#achievements .section-title,
+#achievements .section-desc {
+  opacity: 0;
+}
+
+#achievements .section-head.is-head-in .section-kicker {
+  animation: kickerIn 1.5s cubic-bezier(0.37, 0, 0.63, 1) both 0.2s;
+}
+
+#achievements .section-head.is-head-in .section-title {
+  animation: titleIn 1.8s cubic-bezier(0.37, 0, 0.63, 1) both 0.5s;
+}
+
+#achievements .section-head.is-head-in .section-desc {
+  animation: descIn 1.6s cubic-bezier(0.37, 0, 0.63, 1) both 1.3s;
+}
+
+/* 金色分隔线：从左向右长出来 */
+#achievements .section-head.is-head-in .section-title::after {
+  animation: lineGrow 1.5s cubic-bezier(0.37, 0, 0.63, 1) both 2.1s;
+}
+
+@keyframes kickerIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes titleIn {
+  from { opacity: 0; transform: translateY(18px) scale(1.06); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes descIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes lineGrow {
+  from { width: 0; opacity: 0; }
+  to   { width: 44px; opacity: 1; }
+}

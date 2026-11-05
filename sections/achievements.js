@@ -8,13 +8,13 @@
   var html = `    <!-- ===== 二、学科成果 ===== -->
     <section class="section section--alt" id="achievements">
       <div class="container">
-        <div class="section-head reveal">
+        <div class="section-head">
           <span class="section-kicker">02 / DISCIPLINE</span>
           <h2 class="section-title">学科成果</h2>
           <p class="section-desc">从无线电专业到一级学科博士点，一条完整的信息学科成长线。</p>
         </div>
 
-        <div class="disc-lead reveal">
+        <div class="disc-lead reveal slide-left">
           <p>服务水利、海洋信息化与领域专用通信系统，已成为水利、海洋等行业
             <b>“信息与通信工程”学科关键技术的创新基地</b>，水利行业信息与通信工程的引领者。</p>
 
@@ -27,7 +27,7 @@
         </div>
 
 
-        <div class="disc-grid">
+        <div class="disc-grid reveal slide-right">
           <article class="disc-card reveal">
             <header>
               <h3>信息与通信工程</h3>
@@ -55,7 +55,7 @@
           </article>
         </div>
 
-        <ol class="disc-milestones reveal" aria-label="学科建设里程碑">
+        <ol class="disc-milestones reveal slide-left" aria-label="学科建设里程碑">
           <li><span class="ms-year">1960</span><span class="ms-text">无线电设计与制造专业</span></li>
           <li><span class="ms-year">1998</span><span class="ms-text">通信与信息系统二级硕士点</span></li>
           <li><span class="ms-year">2005</span><span class="ms-text">信息与通信工程一级硕士点</span></li>
@@ -64,7 +64,7 @@
           <li><span class="ms-year">2024</span><span class="ms-text">电子信息专博点</span></li>
         </ol>
 
-        <div class="platform-block reveal">
+        <div class="platform-block reveal slide-right">
           <div class="platform-head">
             <h3>学科平台</h3>
             <p>1 个教育部重点实验室 · 8 个省市级科技平台</p>
@@ -90,7 +90,7 @@
           </div>
         </div>
 
-        <div class="team-block reveal">
+        <div class="team-block reveal slide-left">
           <div class="platform-head">
             <h3>师资队伍</h3>
             <p>专任教师博士比例 92% · 海外经历 46.6%</p>
@@ -122,7 +122,7 @@
           <p class="team-foot">在校本科生 1850 余名 · 研究生 600 余名 · 留学生 30 余名</p>
         </div>
 
-        <div class="cards cards--three">
+        <div class="cards cards--three reveal slide-right">
           <article class="card reveal">
             <span class="card-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
@@ -188,4 +188,76 @@
   }, { threshold: 0.3 });
 
   io.observe(rail);
+})();
+
+/* ---------- 学科成果：左右滑入 + 淡入，每次进入重播 ---------- */
+(function () {
+  var blocks = Array.prototype.slice.call(
+    document.querySelectorAll(".slide-left, .slide-right")
+  );
+  if (!blocks.length) return;
+
+  var panel = document.querySelector('[data-panel="achievements"]');
+  var rail = document.querySelector(".disc-milestones");
+
+  function inView(el) {
+    var r = el.getBoundingClientRect();
+    return r.top < window.innerHeight - 40 && r.bottom > 0;
+  }
+
+  function play(onlyVisible) {
+    blocks.forEach(function (b) {
+      b.classList.remove("is-slid");
+      if (rail) rail.classList.remove("is-in");
+    });
+
+    var headEl = document.querySelector("#achievements .section-head");
+    var secEl = document.getElementById("achievements");
+    if (headEl) headEl.classList.remove("is-head-in");
+    if (secEl) secEl.classList.remove("is-sec-in");
+
+    /* 强制回流，让动画回到起点 */
+    void document.body.offsetHeight;
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        blocks.forEach(function (b) {
+          if (!onlyVisible || inView(b)) b.classList.add("is-slid");
+        });
+        if (rail && inView(rail)) rail.classList.add("is-in");
+
+        /* 整体入场：容器 + 标题区 */
+        var head = document.querySelector("#achievements .section-head");
+        var sec = document.getElementById("achievements");
+        if (sec) sec.classList.add("is-sec-in");
+        if (head) head.classList.add("is-head-in");
+      });
+    });
+  }
+
+  /* 滚动进入视野时播放（不重复打扰已播过的块） */
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && !entry.target.classList.contains("is-slid")) {
+          entry.target.classList.add("is-slid");
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+
+    blocks.forEach(function (b) { io.observe(b); });
+  } else {
+    blocks.forEach(function (b) { b.classList.add("is-slid"); });
+  }
+
+  /* 每次切到本板块：全部重置并重播 */
+  if (panel && "MutationObserver" in window) {
+    new MutationObserver(function (list) {
+      list.forEach(function (m) {
+        if (m.attributeName === "class" && !panel.classList.contains("is-hidden")) {
+          play(true);
+        }
+      });
+    }).observe(panel, { attributes: true, attributeFilter: ["class"] });
+  }
 })();
