@@ -83,7 +83,9 @@
           revealObserver.unobserve(entry.target);
         });
       },
-      { threshold: 0.15, rootMargin: "0px 0px -60px 0px" }
+      // 阈值压低、下边距收紧：元素一进视口就给亮，不用等露出 15% 高度，
+      // 否则大段文字要滚很深才出现，看着像「没加载」
+      { threshold: 0.06, rootMargin: "0px 0px -24px 0px" }
     );
 
     revealItems.forEach(function (el) {
@@ -96,6 +98,19 @@
       if (i > 0) el.style.transitionDelay = Math.min(i * 0.09, 0.45) + "s";
       revealObserver.observe(el);
     });
+
+    // 兜底：个别浏览器首帧不回调，元素卡在 opacity:0 等鼠标一动才显出来。
+    // 页面对首屏里已经露头的元素再扫一遍，直接点亮。
+    window.setTimeout(function () {
+      revealItems.forEach(function (el) {
+        if (el.classList.contains("is-visible")) return;
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) {
+          el.classList.add("is-visible");
+          revealObserver.unobserve(el);
+        }
+      });
+    }, 600);
   } else {
     revealItems.forEach(function (el) { el.classList.add("is-visible"); });
   }
