@@ -1,16 +1,16 @@
 /* ============================================================
-   一、校史时间轴
+   一、院史时间轴
    负责这一板块的同学只需要改这个文件。
    本次改动：七个年份节点全部配上影像（校史馆藏 + 常州校区实景），
    影像放在卡片顶部，图注标注真实年份与来源，不冒充当年现场。
    ============================================================ */
 (function () {
-  var html = `    <!-- ===== 一、校史时间轴 ===== -->
+  var html = `    <!-- ===== 一、院史时间轴 ===== -->
     <section class="section" id="history">
       <div class="container">
         <div class="section-head reveal">
           <span class="section-kicker">01 / HISTORY</span>
-          <h2 class="section-title">校史时间轴</h2>
+          <h2 class="section-title">院史时间轴</h2>
           <p class="section-desc">从无线电专业到信息科学与工程学院，七次跨越。每一次更名，都是一次学科版图的重新划定。</p>
         </div>
 
@@ -128,7 +128,7 @@
 })();
 
 
-/* ---------- 校史时间轴：每次切到本板块都重播淡入 ---------- */
+/* ---------- 院史时间轴：每次切到本板块都重播淡入 ---------- */
 (function () {
   var panel = document.querySelector('[data-panel="history"]');
   var items = Array.prototype.slice.call(
