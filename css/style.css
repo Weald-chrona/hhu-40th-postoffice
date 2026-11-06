@@ -309,6 +309,8 @@ button {
     /* 底部对齐：裁掉的是上方天空（本来就要被渐变吃掉），校名石留在画面里 */
     background-position: center bottom;
     transform: none;
+    /* 照片不带 transform 缩放，那条推进动画只属于桌面取景 */
+    animation: none;
   }
 
   /* 照片上缘融进上方深蓝，不留一道横边 */
@@ -341,6 +343,53 @@ button {
     height: 64%;
     background-position: center bottom;
   }
+}
+
+/* ===== 学院概况页开场动画 =====
+   三行文字依次从下方滑入；照片缓慢推进一点，进场有呼吸感。
+   hero 就在首屏，页面一打开就播，不需要 IntersectionObserver。
+   尊重系统的减少动态效果设置（见文件底部那组 media query）。 */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-bg-drift {
+  from {
+    transform: scale(1.19) translateY(-2%);
+  }
+  to {
+    transform: scale(1.12) translateY(-2%);
+  }
+}
+
+.hero--page .hero-kicker,
+.hero--page .hero-title,
+.hero--page .hero-sub {
+  animation: hero-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hero--page .hero-kicker {
+  animation-delay: 0.12s;
+}
+
+.hero--page .hero-title {
+  animation-delay: 0.28s;
+}
+
+.hero--page .hero-sub {
+  animation-delay: 0.44s;
+}
+
+/* 照片从略大缓缓收到取景位置；手机端照片不带 transform，直接不播 */
+.hero--page .hero-bg {
+  animation: hero-bg-drift 5.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* 照片下缘别硬切一道边：盖一层从透明到 --bg 的渐变，让图自己淡进白底。
@@ -913,6 +962,10 @@ button {
 
 @media (prefers-reduced-motion: reduce) {
   .photo-track { animation: none; }
+  .hero--page .hero-kicker,
+  .hero--page .hero-title,
+  .hero--page .hero-sub,
+  .hero--page .hero-bg { animation: none; }
 }
 
 /* =========================================================
