@@ -409,3 +409,76 @@
   // 首次进入：地址栏带 #history 就直接打开那个板块
   show(TAB_BY_HASH[location.hash] || "postoffice", false);
 })();
+
+/* ---------- 主题切换（默认 / 静谧蓝 / 珊瑚粉） ---------- */
+(function () {
+  var THEMES = [
+    { id: "default", name: "默认 · 深蓝金" },
+    { id: "blue", name: "静谧蓝" },
+    { id: "rose", name: "珊瑚粉" },
+    { id: "noir", name: "黑金 · 深色" },
+    { id: "mocha", name: "棕米 · 大地" },
+    { id: "sage", name: "绿粉 · 森系" },
+    { id: "crimson", name: "赤金 · 中国红" }
+  ];
+
+  var KEY = "hhu40-theme";
+
+  function apply(id) {
+    if (id === "default") {
+      document.documentElement.removeAttribute("data-theme");
+    } else {
+      document.documentElement.setAttribute("data-theme", id);
+    }
+    try { localStorage.setItem(KEY, id); } catch (e) {}
+  }
+
+  var saved = "default";
+  try { saved = localStorage.getItem(KEY) || "default"; } catch (e) {}
+  apply(saved);
+
+  var fab = document.createElement("button");
+  fab.className = "theme-fab";
+  fab.type = "button";
+  fab.setAttribute("aria-label", "切换配色主题");
+  fab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><circle cx="9" cy="9.5" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="15" cy="9.5" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="12" cy="15" r="1.2" fill="currentColor" stroke="none"></circle></svg>';
+
+  var panel = document.createElement("div");
+  panel.className = "theme-panel";
+  panel.innerHTML = "<h4>选择主题</h4>" + THEMES.map(function (t) {
+    return '<button type="button" class="theme-opt" data-theme-id="' + t.id + '">' +
+      '<span class="theme-chip theme-chip--' + t.id + '"></span>' + t.name + "</button>";
+  }).join("");
+
+  document.body.appendChild(panel);
+  document.body.appendChild(fab);
+
+  function sync() {
+    var current = document.documentElement.getAttribute("data-theme") || "default";
+    Array.prototype.forEach.call(panel.querySelectorAll(".theme-opt"), function (b) {
+      b.classList.toggle("is-active", b.getAttribute("data-theme-id") === current);
+    });
+  }
+
+  fab.addEventListener("click", function (e) {
+    e.stopPropagation();
+    panel.classList.toggle("is-open");
+    sync();
+  });
+
+  panel.addEventListener("click", function (e) {
+    var btn = e.target.closest(".theme-opt");
+    if (!btn) return;
+    apply(btn.getAttribute("data-theme-id"));
+    sync();
+    panel.classList.remove("is-open");
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!panel.contains(e.target) && !fab.contains(e.target)) {
+      panel.classList.remove("is-open");
+    }
+  });
+
+  sync();
+})();
