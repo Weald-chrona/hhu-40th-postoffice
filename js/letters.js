@@ -1986,6 +1986,13 @@
     els.wallCount = document.getElementById('poWallCount');
     els.wallEmpty = document.getElementById('poWallEmpty');
 
+    /* 三个浮层挂到 body 下。板块切换的入场动画（panelIn）会给 .panel 加 transform，
+       而 position:fixed 的子元素一旦有带 transform 的祖先，就会相对那个祖先定位 ——
+       浮层会跑到板块的中间（可能在屏幕外），而不是屏幕正中。挪到 body 就没这回事。 */
+    [els.form, els.stampWrap, els.desk].forEach(function (m) {
+      if (m && m.parentNode !== document.body) document.body.appendChild(m);
+    });
+
     preloadArt();   // 票面花稿先抓下来，点开邮票和导出 PNG 都直接能用
 
     initBackend();
