@@ -1,9 +1,10 @@
 /* ============================================================
-   学科成果 样式
-   负责：学科成果板块的同学。
+   学科成果 样式（重构版）
+   负责：队友 B
+   结构：基础数据条 → 成果卡 → 特色引语 → 学科方向双栏 → 学科里程碑
    ============================================================ */
 
-/* ---------- 7. 数据概览 ---------- */
+/* ---------- 7. 数据条（基础） ---------- */
 .stats {
   position: relative;
   z-index: 5;
@@ -48,6 +49,13 @@
   color: var(--muted);
 }
 
+/* ---------- 数据条（本板块） ---------- */
+.stats-inline {
+  margin-bottom: 56px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
 
 /* ---------- 10. 成果卡片 ---------- */
 .cards {
@@ -103,119 +111,603 @@
   color: var(--muted);
 }
 
-/* ---------- 11. 轮播 ---------- */
-.carousel {
-  position: relative;
-  overflow: hidden;
-  border-radius: 22px;
-  background: var(--blue-900);
+/* ---------- 特色引语 ---------- */
+.disc-lead {
+  margin: 0 auto 56px;
+  max-width: 860px;
+  padding-left: 24px;
+  border-left: 3px solid var(--gold);
+}
+
+.disc-lead p {
+  font-size: clamp(15px, 1.7vw, 19px);
+  line-height: 2;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.disc-lead b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ---------- 学科方向双栏 ---------- */
+.disc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 56px;
+}
+
+.disc-card {
+  padding: 34px 32px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--blue-600);
+  border-radius: var(--radius);
+  transition: transform 0.35s ease, box-shadow 0.35s ease,
+    border-color 0.35s ease, border-top-color 0.35s ease;
+}
+
+.disc-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(217, 164, 65, 0.5);
+  border-top-color: var(--gold);
   box-shadow: var(--shadow);
 }
 
-.carousel-track {
-  display: flex;
-  transition: transform 0.75s cubic-bezier(0.66, 0, 0.34, 1);
-  will-change: transform;
+.disc-card header {
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px dashed var(--line);
 }
 
-.slide {
-  position: relative;
-  flex: 0 0 100%;
-  margin: 0;
+.disc-card h3 {
+  font-size: 21px;
+  letter-spacing: 0.05em;
 }
 
-.slide img {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
-  opacity: 0.9;
-}
-
-.slide-body {
-  position: absolute;
-  inset: auto 0 0 0;
-  padding: 90px 48px 72px;
-  background: linear-gradient(180deg, transparent, rgba(4, 16, 30, 0.88) 62%);
-  color: #fff;
-}
-
-.slide-index {
-  display: inline-block;
-  margin-bottom: 8px;
+.disc-sub {
+  margin-top: 8px;
   font-size: 13px;
-  letter-spacing: 0.3em;
-  color: var(--gold-soft);
+  letter-spacing: 0.06em;
+  color: var(--muted);
 }
 
-.slide-body h3 {
-  font-size: clamp(20px, 2.4vw, 28px);
-  color: #fff;
+.disc-card ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.disc-card li {
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
+.disc-card li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: linear-gradient(135deg, var(--blue-400), var(--gold));
+}
+
+/* ---------- 学科里程碑：学士帽轨道 + 生长动画 ---------- */
+.disc-milestones {
+  position: relative;
+  display: flex;
+  height: 248px;
+  margin: 0 0 64px;
+  padding: 0 10px;
+  list-style: none;
+  background: linear-gradient(180deg, rgba(14, 76, 146, 0.035), rgba(217, 164, 65, 0.035));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* 轨道：进入视口后从左向右生长 */
+.disc-milestones::before {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 124px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    rgba(14, 76, 146, 0.08),
+    rgba(217, 164, 65, 0.55) 50%,
+    rgba(14, 76, 146, 0.08));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 3.75s cubic-bezier(0.22, 0.7, 0.2, 1);
+}
+
+.disc-milestones.is-in::before {
+  transform: scaleX(1);
+}
+
+.disc-milestones li {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 6px;
+}
+
+.disc-milestones li:nth-child(odd) {
+  justify-content: flex-end;
+  padding-bottom: 156px;
+}
+
+.disc-milestones li:nth-child(even) {
+  justify-content: flex-start;
+  padding-top: 156px;
+}
+
+/* 节点：学士帽图标 */
+.disc-milestones li::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 110px;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23d9a441'%20stroke-width='1.8'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2.5%208.5L12%204l9.5%204.5L12%2013%202.5%208.5z'/%3E%3Cpath%20d='M6.5%2010.8V15c0%201.7%202.5%203%205.5%203s5.5-1.3%205.5-3v-4.2'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 0 8px rgba(217, 164, 65, 0.45));
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.45s ease,
+    transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 0.3s ease;
+}
+
+/* 依次点亮 */
+.disc-milestones.is-in li::after {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.disc-milestones.is-in li:nth-child(1)::after { transition-delay: 1s; }
+.disc-milestones.is-in li:nth-child(2)::after { transition-delay: 1.55s; }
+.disc-milestones.is-in li:nth-child(3)::after { transition-delay: 2.1s; }
+.disc-milestones.is-in li:nth-child(4)::after { transition-delay: 2.65s; }
+.disc-milestones.is-in li:nth-child(5)::after { transition-delay: 3.2s; }
+.disc-milestones.is-in li:nth-child(6)::after { transition-delay: 3.75s; }
+
+.disc-milestones li:hover::after {
+  transform: scale(1.18);
+  filter: drop-shadow(0 0 14px rgba(217, 164, 65, 0.8));
+}
+
+.ms-year {
+  display: block;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--blue-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.ms-text {
+  display: block;
+  margin-top: 6px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .disc-milestones {
+    flex-direction: column;
+    height: auto;
+    padding: 24px 22px;
+    gap: 20px;
+  }
+
+  .disc-milestones::before {
+    left: 30px;
+    right: auto;
+    top: 30px;
+    bottom: 30px;
+    width: 2px;
+    height: auto;
+    transform: scaleY(0);
+    transform-origin: top center;
+    background: linear-gradient(180deg,
+      rgba(14, 76, 146, 0.08),
+      rgba(217, 164, 65, 0.5),
+      rgba(14, 76, 146, 0.08));
+  }
+
+  .disc-milestones.is-in::before {
+    transform: scaleY(1);
+  }
+
+  .disc-milestones li,
+  .disc-milestones li:nth-child(odd),
+  .disc-milestones li:nth-child(even) {
+    justify-content: flex-start;
+    padding: 0 0 0 44px;
+  }
+
+  .disc-milestones li::after {
+    left: 16px;
+    top: 2px;
+    margin-left: 0;
+    width: 24px;
+    height: 24px;
+  }
+
+  .ms-year {
+    font-size: 18px;
+  }
+}
+
+/* ---------- 学科平台矩阵 ---------- */
+.platform-block {
+  margin-bottom: 64px;
+  padding: 34px 32px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.platform-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.platform-head h3 {
+  font-size: 21px;
+  letter-spacing: 0.05em;
+}
+
+.platform-head p {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.platform-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+  background: linear-gradient(120deg, rgba(14, 76, 146, 0.06), rgba(217, 164, 65, 0.13));
+  border-left: 3px solid var(--gold);
+  border-radius: 10px;
+}
+
+.platform-badge {
+  flex: 0 0 auto;
+  padding: 3px 12px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  color: #241a06;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.06em;
 }
 
-.slide-body p {
-  margin-top: 8px;
-  font-size: 14.5px;
-  color: rgba(255, 255, 255, 0.72);
+.platform-badge--sub {
+  background: rgba(14, 76, 146, 0.1);
+  color: var(--blue-600);
 }
 
-.carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  display: grid;
-  place-items: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  font-size: 28px;
-  line-height: 1;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(8px);
-  transition: background 0.25s, color 0.25s, transform 0.25s;
+.platform-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
 }
 
-.carousel-btn:hover {
-  background: var(--gold);
-  border-color: var(--gold);
-  color: #241a06;
-}
-
-.carousel-btn--prev { left: 24px; }
-.carousel-btn--next { right: 24px; }
-
-.carousel-dots {
-  position: absolute;
-  left: 48px;
-  bottom: 28px;
+.platform-group {
   display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.platform-tags {
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
-.carousel-dots button {
-  width: 9px;
-  height: 9px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.4);
-  transition: width 0.3s ease, background 0.3s ease;
+.platform-tags span {
+  padding: 7px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
 }
 
-.carousel-dots button.is-active {
-  width: 30px;
-  background: var(--gold);
+.platform-tags span:hover {
+  border-color: rgba(217, 164, 65, 0.6);
+  background: var(--white);
+  color: var(--ink);
 }
 
+.cards--three {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .platform-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+/* ---------- 师资队伍 ---------- */
+.team-block {
+  margin-bottom: 64px;
+  padding: 34px 32px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.team-stats {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.team-stats > div {
+  padding: 16px 6px;
+  text-align: center;
+  background: var(--bg);
+  border-radius: 10px;
+}
+
+.team-stats b {
+  display: block;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--blue-600);
+  font-variant-numeric: tabular-nums;
+}
+
+.team-stats span {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.team-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.team-foot {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .team-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .team-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .team-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- 引语下方的一行数字 ---------- */
+.disc-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--line);
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.disc-facts span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.disc-facts b {
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--blue-600);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 560px) {
+  .disc-facts {
+    gap: 8px 18px;
+    font-size: 13px;
+  }
+
+  .disc-facts b {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .disc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ---------- 去组件感：收小圆角 ---------- */
+.card,
+.disc-card,
+.platform-block,
+.team-block,
+.disc-milestones {
+  border-radius: 8px;
+}
+
+/* ---------- 数字改衬线，增加报告感 ---------- */
+.disc-facts b,
+.ms-year,
+.team-stats b {
+  font-family: Georgia, "Times New Roman", "Songti SC", "STSong", serif;
+  font-weight: 700;
+  letter-spacing: 0;
+  font-variant-numeric: lining-nums tabular-nums;
+}
 
 /* =========================================================
-   以下为四板块改版新增样式
+   学科成果：区块左右交错滑入 + 淡入
    ========================================================= */
+.slide-left,
+.slide-right {
+  opacity: 0;
+  will-change: opacity, transform;
+}
 
-/* ---------- 18. 学科成果：内嵌数据条 ---------- */
-.stats-inline {
-  margin-bottom: 60px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  box-shadow: none;
+.slide-left {
+  transform: translateX(-340px) scale(0.9);
+}
+
+.slide-right {
+  transform: translateX(340px) scale(0.9);
+}
+
+.slide-left.is-slid {
+  animation: slideInLeft 2.6s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+.slide-right.is-slid {
+  animation: slideInRight 2.6s cubic-bezier(0.37, 0, 0.63, 1) both;
+  animation-delay: 0.08s;
+}
+
+/* 前 45% 完成淡入，之后继续滑动到位 */
+@keyframes slideInLeft {
+  0%   { opacity: 0; transform: translateX(-340px) scale(0.9); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes slideInRight {
+  0%   { opacity: 0; transform: translateX(340px) scale(0.9); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
+
+
+@media (max-width: 900px) {
+  .slide-left,
+  .slide-right {
+    transform: translateY(36px) scale(1);
+  }
+
+  @keyframes slideInLeft {
+    0%   { opacity: 0; transform: translateY(36px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+  }
+
+  @keyframes slideInRight {
+    0%   { opacity: 0; transform: translateY(36px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: none; }
+  }
+}
+
+/* =========================================================
+   学科成果：整块 + 标题区的整体入场
+   ========================================================= */
+#achievements.is-sec-in .container {
+  animation: secIn 2.4s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+@keyframes secIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: none; }
+}
+
+#achievements .section-kicker,
+#achievements .section-title,
+#achievements .section-desc {
+  opacity: 0;
+}
+
+#achievements .section-head.is-head-in .section-kicker {
+  animation: kickerIn 1.5s cubic-bezier(0.37, 0, 0.63, 1) both 0.2s;
+}
+
+#achievements .section-head.is-head-in .section-title {
+  animation: titleIn 1.8s cubic-bezier(0.37, 0, 0.63, 1) both 0.5s;
+}
+
+#achievements .section-head.is-head-in .section-desc {
+  animation: descIn 1.6s cubic-bezier(0.37, 0, 0.63, 1) both 1.3s;
+}
+
+/* 金色分隔线：从左向右长出来 */
+#achievements .section-head.is-head-in .section-title::after {
+  animation: lineGrow 1.5s cubic-bezier(0.37, 0, 0.63, 1) both 2.1s;
+}
+
+@keyframes kickerIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes titleIn {
+  from { opacity: 0; transform: translateY(18px) scale(1.06); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes descIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes lineGrow {
+  from { width: 0; opacity: 0; }
+  to   { width: 44px; opacity: 1; }
 }

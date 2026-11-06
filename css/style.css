@@ -23,6 +23,10 @@
   --radius: 18px;
   --shadow-sm: 0 6px 20px -10px rgba(6, 27, 51, 0.35);
   --shadow: 0 24px 60px -28px rgba(6, 27, 51, 0.55);
+  --nav-bg: rgba(4, 16, 30, 0.9);
+  --nav-ink: rgba(255, 255, 255, 0.82);
+  --nav-ink-hover: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.08);
   --maxw: 1180px;
   --nav-h: 76px;
 }
@@ -131,7 +135,7 @@ button {
 }
 
 .nav.is-scrolled {
-  background: rgba(4, 16, 30, 0.9);
+  background: var(--nav-bg);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 12px 30px -20px rgba(0, 0, 0, 0.9);
@@ -140,7 +144,7 @@ button {
 /* 切到板块后页面回到顶部，此时滚动监听会把 is-scrolled 摘掉，
    导航变透明会盖在浅色板块上看不清，所以用 is-solid 常驻实心 */
 .nav.is-solid {
-  background: rgba(4, 16, 30, 0.9);
+  background: var(--nav-bg);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 12px 30px -20px rgba(0, 0, 0, 0.9);
@@ -201,7 +205,7 @@ button {
   position: relative;
   padding: 9px 16px;
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--nav-ink);
   border-radius: 999px;
   transition: color 0.25s, background 0.25s;
 }
@@ -220,8 +224,8 @@ button {
 }
 
 .nav-links a:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--nav-ink-hover);
+  background: var(--nav-hover-bg);
 }
 
 .nav-links a:hover::after {
@@ -721,9 +725,9 @@ button {
 /* ---------- 15. 滚动入场 ---------- */
 .reveal {
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
-    transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform: translateY(44px);
+  transition: opacity 0.95s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.95s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 .reveal.is-visible {
@@ -979,7 +983,7 @@ button {
 .nav-links a.is-active {
   color: #fff;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--nav-hover-bg);
 }
 
 .nav-links a.is-active::after {
@@ -991,4 +995,303 @@ button {
   font-weight: 600;
 }
 
+/* =========================================================
+   板块切换：整块滑入 + 淡入
+   ========================================================= */
+[data-panel].is-entering {
+  animation: panelIn 1.8s cubic-bezier(0.25, 0.8, 0.35, 1) both;
+}
 
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* =========================================================
+   主题切换：静谧蓝 / 珊瑚粉
+   只覆盖变量，不改任何布局规则
+   ========================================================= */
+
+[data-theme="blue"] {
+  --nav-bg: rgba(20, 33, 61, 0.94);
+  --nav-ink: rgba(226, 236, 250, 0.82);
+  --nav-ink-hover: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.10);
+  --blue-900: #14213d;
+  --blue-800: #1b2e52;
+  --blue-700: #2e4a85;
+  --blue-600: #4167b1;
+  --blue-400: #6e93d6;
+  --gold: #6e93d6;
+  --gold-soft: #b9cff0;
+  --gold-deep: #35538f;
+  --ink: #1b1f23;
+  --text: #43505f;
+  --muted: #7b8794;
+  --line: rgba(65, 103, 177, 0.16);
+  --bg: #eef6fb;
+  --white: #ffffff;
+}
+
+[data-theme="rose"] {
+  --nav-bg: rgba(42, 31, 36, 0.94);
+  --nav-ink: rgba(255, 240, 240, 0.82);
+  --nav-ink-hover: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.10);
+  --blue-900: #2a1f24;
+  --blue-800: #3b2a31;
+  --blue-700: #6e4351;
+  --blue-600: #ef6078;
+  --blue-400: #f58fa1;
+  --gold: #c689aa;
+  --gold-soft: #e3b9cc;
+  --gold-deep: #a6638a;
+  --ink: #1b1f23;
+  --text: #4a4046;
+  --muted: #8a7c83;
+  --line: rgba(239, 96, 120, 0.18);
+  --bg: #f9f7ea;
+  --white: #fffdf6;
+}
+
+/* ---------- 切换按钮 ---------- */
+.theme-fab {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  /* 邮局写信 / 邮票浮层是 960，按钮要压在其下，不然会浮在遮罩上面 */
+  z-index: 950;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--blue-600);
+  box-shadow: 0 10px 26px -14px rgba(6, 27, 51, 0.6);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+}
+
+.theme-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -14px rgba(6, 27, 51, 0.7);
+}
+
+.theme-fab svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* 邮局写信 / 拆信浮层的父级 .panel 有 transform，自成层叠上下文，
+   光靠 z-index 压不住这个固定按钮，所以浮层打开时直接把它收起来 */
+body.po-modal-open .theme-fab,
+body.po-modal-open .theme-panel {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.96);
+}
+
+/* ---------- 面板 ---------- */
+.theme-panel {
+  position: fixed;
+  right: 22px;
+  bottom: 78px;
+  z-index: 951;
+  width: 208px;
+  padding: 10px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 22px 48px -24px rgba(6, 27, 51, 0.6);
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.theme-panel.is-open {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.theme-panel h4 {
+  margin: 4px 6px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.theme-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.theme-opt:hover {
+  background: var(--bg);
+}
+
+.theme-opt.is-active {
+  background: var(--bg);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.theme-chip {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.theme-chip--default {
+  background: linear-gradient(135deg, #0e4c92 50%, #d9a441 50%);
+}
+
+.theme-chip--blue {
+  background: linear-gradient(135deg, #4167b1 50%, #def0f9 50%);
+}
+
+.theme-chip--rose {
+  background: linear-gradient(135deg, #ef6078 50%, #c689aa 50%);
+}
+
+@media (max-width: 560px) {
+  .theme-fab {
+    right: 14px;
+    bottom: 14px;
+    width: 42px;
+    height: 42px;
+  }
+
+  .theme-panel {
+    right: 14px;
+    bottom: 66px;
+  }
+}
+
+/* ---------- 黑金 · 深色 ---------- */
+[data-theme="noir"] {
+  --nav-bg: rgba(16, 16, 16, 0.94);
+  --nav-ink: rgba(242, 242, 242, 0.82);
+  --nav-ink-hover: #c29d59;
+  --nav-hover-bg: rgba(194, 157, 89, 0.16);
+  --blue-900: #101010;
+  --blue-800: #161616;
+  --blue-700: #1a1a1a;
+  --blue-600: #c29d59;
+  --blue-400: #d9bb84;
+  --gold: #c29d59;
+  --gold-soft: #e0c793;
+  --gold-deep: #a8802f;
+  --ink: #f2f2f2;
+  --text: #cfcfcf;
+  --muted: #8f8f8f;
+  --line: rgba(194, 157, 89, 0.22);
+  --bg: #1c1c1c;
+  --white: #242424;
+  color-scheme: dark;
+}
+
+/* ---------- 棕米 · 大地色 ---------- */
+[data-theme="mocha"] {
+  --nav-bg: rgba(43, 36, 32, 0.94);
+  --nav-ink: rgba(250, 240, 222, 0.85);
+  --nav-ink-hover: #fbf7ef;
+  --nav-hover-bg: rgba(251, 247, 239, 0.12);
+  --blue-900: #2b2420;
+  --blue-800: #382f29;
+  --blue-700: #6b5443;
+  --blue-600: #b57743;
+  --blue-400: #cf9a6d;
+  --gold: #b57743;
+  --gold-soft: #dcc3a4;
+  --gold-deep: #8e5a30;
+  --ink: #352e2a;
+  --text: #4a4038;
+  --muted: #8a7a6b;
+  --line: rgba(53, 46, 42, 0.18);
+  --bg: #ebdec6;
+  --white: #fbf7ef;
+}
+
+/* ---------- 绿粉 · 森系 ---------- */
+[data-theme="sage"] {
+  --nav-bg: rgba(43, 58, 43, 0.94);
+  --nav-ink: rgba(244, 250, 240, 0.85);
+  --nav-ink-hover: #ffffff;
+  --nav-hover-bg: rgba(255, 255, 255, 0.12);
+  --blue-900: #2b3a2b;
+  --blue-800: #354835;
+  --blue-700: #44603f;
+  --blue-600: #567357;
+  --blue-400: #7fa07a;
+  --gold: #e58889;
+  --gold-soft: #f2b3b4;
+  --gold-deep: #c26364;
+  --ink: #2f3d2f;
+  --text: #4b5a4b;
+  --muted: #8a9a88;
+  --line: rgba(86, 115, 87, 0.2);
+  --bg: #f9f0ed;
+  --white: #fffdfc;
+}
+
+.theme-chip--noir {
+  background: linear-gradient(135deg, #1c1c1c 50%, #c29d59 50%);
+}
+
+.theme-chip--mocha {
+  background: linear-gradient(135deg, #352e2a 50%, #b57743 50%);
+}
+
+.theme-chip--sage {
+  background: linear-gradient(135deg, #567357 50%, #e58889 50%);
+}
+
+/* ---------- 赤金 · 中国红 ---------- */
+[data-theme="crimson"] {
+  --nav-bg: rgba(0, 48, 73, 0.94);
+  --nav-ink: rgba(248, 233, 161, 0.86);
+  --nav-ink-hover: #f8e9a1;
+  --nav-hover-bg: rgba(248, 233, 161, 0.14);
+  --blue-900: #003049;
+  --blue-800: #00263a;
+  --blue-700: #00405f;
+  --blue-600: #d62828;
+  --blue-400: #e85c5c;
+  --gold: #d62828;
+  --gold-soft: #f8e9a1;
+  --gold-deep: #a81f1f;
+  --ink: #10222e;
+  --text: #3a4a56;
+  --muted: #7d8b96;
+  --line: rgba(0, 48, 73, 0.16);
+  --bg: #fbf9f2;
+  --white: #ffffff;
+}
+
+.theme-chip--crimson {
+  background: linear-gradient(135deg, #d62828 50%, #003049 50%);
+}
