@@ -281,6 +281,8 @@ button {
 }
 
 .hero--page {
+  /* 底部白渐变的高度，手机端会改小一点 */
+  --hero-fade: 16%;
   /* 占满整屏，标题靠 grid 居中；手机用它的小视口高度，免得地址栏收起时跳 */
   min-height: 100vh;
   min-height: 100svh;
@@ -293,6 +295,54 @@ button {
   transform: scale(1.12) translateY(-2%);
 }
 
+/* 手机竖屏：这张横图 55% 是深蓝天空，铺满是压不下去的（图高≈容器高，
+   改 background-position 无效）。改成照片只占下半屏，上半用同色深蓝接住，
+   照片上缘再盖一层深蓝渐变融进去，标题就压在干净的深底上 */
+@media (max-width: 900px) {
+  .hero--page {
+    background: #04101e;
+  }
+
+  .hero--page .hero-bg {
+    inset: auto 0 0 0;
+    height: 64%;
+    /* 底部对齐：裁掉的是上方天空（本来就要被渐变吃掉），校名石留在画面里 */
+    background-position: center bottom;
+    transform: none;
+  }
+
+  /* 照片上缘融进上方深蓝，不留一道横边 */
+  .hero--page .hero-bg::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 34%;
+    background: linear-gradient(
+      to bottom,
+      #04101e 0%,
+      rgba(4, 16, 30, 0.72) 46%,
+      rgba(4, 16, 30, 0) 100%
+    );
+  }
+
+  /* 照片只占下半，底部白渐变按 hero 全高算会偏厚，压到校名石，改薄一点 */
+  .hero--page {
+    --hero-fade: 11%;
+  }
+}
+
+/* 手机窄屏：横图在竖屏里只剩中间一条，换成居中竖裁的版本（640×900，
+   裁掉了上方天空）。只露中间两块校名石，但大道纵深完整、有取景感 */
+@media (max-width: 700px) {
+  .hero--page .hero-bg {
+    background-image: url("../images/hero-gate-mobile.jpg");
+    height: 64%;
+    background-position: center bottom;
+  }
+}
+
 /* 照片下缘别硬切一道边：盖一层从透明到 --bg 的渐变，让图自己淡进白底。
    只对 .hero--page 生效，首页那个 hero 没有这一层。
    这里的 rgba 数值要和 :root 的 --bg(#f6f8fb) 保持一致。 */
@@ -302,7 +352,7 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 16%;
+  height: var(--hero-fade);
   z-index: -1;
   pointer-events: none;
   background: linear-gradient(
