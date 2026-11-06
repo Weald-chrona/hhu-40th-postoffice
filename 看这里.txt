@@ -1,0 +1,4 @@
+把这里的 index.html、about.html、sections 三样东西
+整个复制到 D:\hhu-40th-postoffice 里，提示替换就点替换。
+
+结构已经和仓库对齐，不需要改名。
