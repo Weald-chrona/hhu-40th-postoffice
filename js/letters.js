@@ -21,7 +21,13 @@
   var LS_LIKE = 'po_liked_v1';
 
   var els = {};
-  var state = { box: null, letters: [], replies: {} };
+  var state = {
+    box: null,
+    letters: [],
+    replies: {},
+    /* 找信用的三个条件。''=没在搜，'all'=全部年代，'new'=按时间（旧→新，跟墙一致） */
+    find: { q: '', box: 'all', sort: 'new' }
+  };
   var db = null;
   var DEMO = true;
 
@@ -714,7 +720,21 @@
     if (state.box) syncActive(state.box);
   }
 
-  function letterHTML(l) {
+  /* 搜索时把命中的词标出来。先转义再替换：词里带 & < > 也不会破坏标签，
+     唯一的小偏差是搜「&」会撞上已经转义成 &amp; 的那几个，属可接受范围 */
+  function hl(s, q) {
+    var out = esc(s);
+    if (!q) return out;
+    var safe = esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    try {
+      return out.replace(new RegExp(safe, 'gi'), function (m) {
+        return '<mark class="po-hl">' + m + '</mark>';
+      });
+    } catch (e) { return out; }
+  }
+
+  function letterHTML(l, opt) {
+    opt = opt || {};
     var liked = likedSet()[l.id] ? 1 : 0;
     var replies = state.replies[l.id] || [];
     var replyHTML = replies.length
@@ -723,14 +743,20 @@
                  esc(r.content) + '</p>';
         }).join('') + '</div>'
       : '';
+    /* 搜索结果是跨年代的，得让每封信自己说清楚它是哪一年的 —— 拆信台里不用，
+       整台子就是一个年代，每张卡再挂一个年代标签反而吵 */
+    var boxTag = opt.showBox
+      ? '<span class="po-letter-box">' + esc((boxById(l.mailbox) || {}).title || '') + '</span>'
+      : '';
 
     return '<article class="po-letter" data-id="' + esc(l.id) + '">' +
              '<div class="po-letter-head">' +
-               '<span class="po-letter-name">' + esc(l.author_name || '匿名') + '</span>' +
+               '<span class="po-letter-name">' + hl(l.author_name || '匿名', opt.q) + '</span>' +
+               boxTag +
                (l.grad_year ? '<span class="po-letter-year">' + esc(yearText(l)) + '</span>' : '') +
                '<span class="po-letter-time">' + esc(fmtTime(l.created_at)) + '</span>' +
              '</div>' +
-             '<div class="po-letter-body">' + esc(l.content) + '</div>' +
+             '<div class="po-letter-body">' + hl(l.content, opt.q) + '</div>' +
              '<div class="po-letter-foot">' +
                '<button class="po-act' + (liked ? ' is-on' : '') + '" data-act="like" data-id="' + esc(l.id) + '">' +
                  '♥ ' + (l.likes || 0) + ' 个赞' +
@@ -747,7 +773,7 @@
       return l.mailbox === state.box && !l.parent_id;
     });
     els.letters.innerHTML = list.length
-      ? list.map(letterHTML).join('')
+      ? list.map(function (l) { return letterHTML(l); }).join('')
       : '<p class="po-empty">这个信箱还没有信，来写第一封吧。</p>';
   }
 
@@ -775,15 +801,124 @@
     return x - Math.floor(x);
   }
 
+  /* ---------- 找信：搜索 + 按年代筛 + 排序 ----------
+     全在前端做。几百封信对浏览器不算事，反而省掉一次请求 ——
+     评委在答辩现场敲两个字要立刻出结果，等不来网络。
+     三个条件同时生效：关键词 AND 年代 AND 排序。 */
+
+  function findQuery() {
+    return (state.find.q || '').trim();
+  }
+
+  /** 有没有在找信（有关键词，或选了某个年代）。没有就正常显示那面墙 */
+  function findOn() {
+    return findQuery() !== '' || state.find.box !== 'all';
+  }
+
+  /** 一封信能不能被搜到：署名、正文、还有它所属的年代名。
+      加年代名是为了搜「2016」「教职工」也能出结果 —— 人想不起署名，只记得是哪一届 */
+  function hitLetter(l, q) {
+    if (!q) return true;
+    var b = boxById(l.mailbox) || {};
+    var hay = [l.author_name, l.content, l.grad_year, b.title, b.num].join(' ').toLowerCase();
+    return hay.indexOf(q) >= 0;
+  }
+
+  /** 按当前条件筛出来、排好序。一律返回「旧→新」，谁要用倒序自己 reverse */
+  function findMatches() {
+    var q = findQuery().toLowerCase();
+    var list = state.letters.filter(function (l) {
+      if (l.parent_id) return false;                       // 回信不单独成条，跟墙一个口径
+      if (state.find.box !== 'all' && l.mailbox !== state.find.box) return false;
+      return hitLetter(l, q);
+    });
+
+    if (state.find.sort === 'hot') {
+      // 同赞的，新的排前面；否则并列的几条每次刷新顺序都在跳
+      list.sort(function (a, b) {
+        return (b.likes || 0) - (a.likes || 0) ||
+               new Date(b.created_at) - new Date(a.created_at);
+      });
+    } else {
+      list.sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+    }
+    return list;
+  }
+
+  var FIND_LIST_MAX = 40;   // 一次最多铺 40 张信纸，再多就是无限滚了
+
+  function renderFindBar() {
+    var chips = els.findChips;
+    if (!chips) return;
+
+    var counts = { all: 0 };
+    BOXES.forEach(function (b) { counts[b.id] = 0; });
+    state.letters.forEach(function (l) {
+      if (l.parent_id) return;
+      counts.all += 1;
+      counts[l.mailbox] = (counts[l.mailbox] || 0) + 1;
+    });
+
+    var html = '<button class="po-chip' + (state.find.box === 'all' ? ' is-on' : '') + '"' +
+               ' type="button" data-find-box="all">全部 <i>' + counts.all + '</i></button>';
+    html += BOXES.map(function (b) {
+      return '<button class="po-chip' + (state.find.box === b.id ? ' is-on' : '') + '"' +
+             ' type="button" data-find-box="' + esc(b.id) + '">' + esc(b.title) +
+             ' <i>' + (counts[b.id] || 0) + '</i></button>';
+    }).join('');
+    chips.innerHTML = html;
+
+    var sortBtns = document.querySelectorAll('[data-find-sort]');
+    for (var i = 0; i < sortBtns.length; i++) {
+      sortBtns[i].classList.toggle('is-on', sortBtns[i].getAttribute('data-find-sort') === state.find.sort);
+    }
+    var clear = document.getElementById('poFindClear');
+    if (clear) clear.classList.toggle('hidden', !state.find.q);
+  }
+
+  /** 搜索结果：直接铺信纸，能读能赞能存图。点开一张票才知道是哪封，等于没搜 */
+  function renderFindList(list) {
+    if (!els.findList) return;
+    var q = findQuery();
+    var shown = list.slice().reverse().slice(0, FIND_LIST_MAX);   // 找信时新的在上
+
+    var html = shown.map(function (l) {
+      return letterHTML(l, { q: q, showBox: true });
+    }).join('');
+
+    if (list.length > FIND_LIST_MAX) {
+      html += '<p class="po-find-more">只显示了最近 ' + FIND_LIST_MAX + ' 封，' +
+              '把条件收窄一点（或者加个关键词）能看到剩下的。</p>';
+    }
+    els.findList.innerHTML = html;
+  }
+
   function renderWall() {
     var board = document.querySelector('[data-po-wall]');
     if (!board) return;
 
-    var list = state.letters.filter(function (l) { return !l.parent_id; })
-      .slice()
-      .sort(function (a, b) { return new Date(a.created_at) - new Date(b.created_at); });
+    var wallSec = board.closest('.po-wall');
+    var list = findMatches();
+    var on = findOn();
 
-    if (list.length > WALL_MAX) list = list.slice(-WALL_MAX);
+    renderFindBar();
+    if (wallSec) wallSec.classList.toggle('is-list', on);
+
+    if (on) {
+      if (els.wallCount) els.wallCount.textContent = list.length ? '找到 ' + list.length + ' 封' : '';
+      if (els.wallEmpty) els.wallEmpty.classList.add('hidden');
+      board.innerHTML = '';
+      if (els.findEmpty) els.findEmpty.classList.toggle('hidden', list.length > 0);
+      if (els.findList) {
+        els.findList.classList.toggle('hidden', list.length === 0);
+        if (list.length) renderFindList(list);
+        else els.findList.innerHTML = '';
+      }
+      return;
+    }
+
+    if (els.findList) els.findList.classList.add('hidden');
+    if (els.findEmpty) els.findEmpty.classList.add('hidden');
 
     if (!list.length) {
       board.innerHTML = '';
@@ -791,18 +926,19 @@
       if (els.wallEmpty) els.wallEmpty.classList.remove('hidden');
       /* 空墙就别留那块深色板了：一条空荡荡的深色横条压在标题下面，
          看着像加载失败的占位块 */
-      var section = board.closest('.po-wall');
-      if (section) section.classList.add('is-empty');
+      if (wallSec) wallSec.classList.add('is-empty');
       return;
     }
-    var wallSec = board.closest('.po-wall');
     if (wallSec) wallSec.classList.remove('is-empty');
     if (els.wallEmpty) els.wallEmpty.classList.add('hidden');
-    if (els.wallCount) {
-      els.wallCount.textContent = state.letters.filter(function (l) { return !l.parent_id; }).length
-        > WALL_MAX
-        ? '最近 ' + WALL_MAX + ' 张'
-        : list.length + ' 张票';
+
+    /* 墙上只贴得下 WALL_MAX 张。按时间看是留最新的（slice 取尾），
+       按赞看是留最高的（排序已经降序，取头） */
+    if (list.length > WALL_MAX) {
+      list = state.find.sort === 'hot' ? list.slice(0, WALL_MAX) : list.slice(-WALL_MAX);
+      if (els.wallCount) els.wallCount.textContent = '最近 ' + WALL_MAX + ' 张';
+    } else if (els.wallCount) {
+      els.wallCount.textContent = list.length + ' 张票';
     }
 
     /* 先一次性铺好空壳，再逐张 paint —— 每张票要读 artBox、算 wash，
@@ -2016,7 +2152,10 @@
         function (row, err) {
           if (err) return;
           refresh();
-          setTimeout(function () { if (state.box) openBox(state.box); }, 60);
+          // 拆信台关着的话（在搜索结果里回的复）就别把它弹出来
+          setTimeout(function () {
+            if (els.desk && !els.desk.classList.contains('hidden') && state.box) openBox(state.box);
+          }, 60);
         });
     });
 
@@ -2044,7 +2183,19 @@
       });
     });
 
-    els.letters.addEventListener('click', function (e) {
+    /* 点赞/回复之后重画一遍。拆信台要是还开着，就顺手把它按新的数字重开；
+       收藏台关着（比如在搜索结果里点的赞）就只重画，别把浮层硬弹出来 */
+    function afterAct() {
+      refresh();
+      setTimeout(function () {
+        if (!els.desk || els.desk.classList.contains('hidden')) return;
+        if (state.box) openBox(state.box);
+      }, 60);
+    }
+
+    /* 一封信上的动作。拆信台和搜索结果用的是同一套结构，绑同一个处理器 ——
+       两处各写一遍，改的时候漏一处就会有一边点不动 */
+    function onLetterAct(e) {
       var btn = e.target.closest('[data-act]');
       if (!btn) return;
       var id = btn.getAttribute('data-id');
@@ -2053,7 +2204,7 @@
       if (act === 'like') {
         if (likedSet()[id]) return;
         markLiked(id);
-        store.like(id, function () { refresh(); setTimeout(function () { if (state.box) openBox(state.box); }, 60); });
+        store.like(id, afterAct);
       } else if (act === 'reply') {
         toggleReplyForm(btn.closest('.po-letter'));
       } else if (act === 'card') {
@@ -2063,7 +2214,69 @@
         }
         if (row) saveCard(row);
       }
-    });
+    }
+
+    els.letters.addEventListener('click', onLetterAct);
+    if (els.findList) els.findList.addEventListener('click', onLetterAct);
+
+    /* ---------- 找信：输入、切年代、换排序 ---------- */
+    var findTimer = null;
+    function applyFind() {
+      /* 搜索词是打字输入的，每敲一下就把几十张票重画一遍太浪费，
+         停手 140ms 再算。chips 和排序不 debounce，点了要立刻有反应 */
+      if (els.findClear) els.findClear.classList.toggle('hidden', !findQuery());
+      renderWall();
+    }
+
+    if (els.findInput) {
+      els.findInput.addEventListener('input', function () {
+        state.find.q = els.findInput.value;
+        clearTimeout(findTimer);
+        findTimer = setTimeout(applyFind, 140);
+      });
+      // 输入法还没上屏就回车，别让它把表单交了
+      els.findInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); clearTimeout(findTimer); applyFind(); }
+      });
+    }
+
+    if (els.findClear) {
+      els.findClear.addEventListener('click', function () {
+        if (!els.findInput) return;
+        els.findInput.value = '';
+        state.find.q = '';
+        clearTimeout(findTimer);
+        applyFind();
+        els.findInput.focus();
+      });
+    }
+
+    if (els.findChips) {
+      els.findChips.addEventListener('click', function (e) {
+        var chip = e.target.closest('[data-find-box]');
+        if (!chip) return;
+        state.find.box = chip.getAttribute('data-find-box');
+        renderWall();
+      });
+    }
+
+    var sortBtns = document.querySelectorAll('[data-find-sort]');
+    for (var si = 0; si < sortBtns.length; si++) {
+      sortBtns[si].addEventListener('click', function () {
+        state.find.sort = this.getAttribute('data-find-sort');
+        renderWall();
+      });
+    }
+
+    var findReset = document.getElementById('poFindReset');
+    if (findReset) {
+      findReset.addEventListener('click', function () {
+        state.find.q = '';
+        state.find.box = 'all';
+        if (els.findInput) els.findInput.value = '';
+        applyFind();
+      });
+    }
 
     /* 纪念墙：点哪张票就打开哪张票的浮层（跟刚寄完看到的是同一个浮层，
        收藏/保存按钮都在，不是另做一套只读预览） */
@@ -2302,6 +2515,11 @@
     els.wall = document.querySelector('[data-po-wall]');
     els.wallCount = document.getElementById('poWallCount');
     els.wallEmpty = document.getElementById('poWallEmpty');
+    els.findInput = document.getElementById('poFindInput');
+    els.findChips = document.getElementById('poFindChips');
+    els.findList = document.getElementById('poFindList');
+    els.findEmpty = document.getElementById('poFindEmpty');
+    els.findClear = document.getElementById('poFindClear');
 
     /* 三个浮层挂到 body 下。板块切换的入场动画（panelIn）会给 .panel 加 transform，
        而 position:fixed 的子元素一旦有带 transform 的祖先，就会相对那个祖先定位 ——

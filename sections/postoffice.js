@@ -87,8 +87,40 @@
               </div>
               <span class="po-wall-count" id="poWallCount"></span>
             </div>
+
+            <!-- ---------- 找信 ----------
+                 墙是「一眼看全部」，搜索是「找那一封」。两者不并排出现：
+                 一搜，墙就换成同尺寸的信纸列表，直接能读、能点赞、能存图 ——
+                 否则搜出三张票还得一张张点开才知道哪张是，等于没搜。
+                 筛选和排序全在前端做（几百封信不差这点算力），见 js/letters.js 的 renderWall()。 -->
+            <div class="po-find" id="poFind">
+              <div class="po-find-bar">
+                <div class="po-find-search">
+                  <svg class="po-find-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="10.5" cy="10.5" r="6.5" />
+                    <path d="M15.5 15.5 21 21" />
+                  </svg>
+                  <input id="poFindInput" type="search" maxlength="30" autocomplete="off"
+                         placeholder="搜署名或一句话" aria-label="搜索信件" />
+                  <button class="po-find-clear hidden" id="poFindClear" type="button" aria-label="清空搜索">&times;</button>
+                </div>
+                <div class="po-find-sort" role="group" aria-label="排序方式">
+                  <button class="po-find-sortbtn is-on" type="button" data-find-sort="new">最新</button>
+                  <button class="po-find-sortbtn" type="button" data-find-sort="hot">最多人赞</button>
+                </div>
+              </div>
+              <div class="po-find-chips" id="poFindChips" role="group" aria-label="按年代筛选"></div>
+            </div>
+
             <div class="po-wall-board" data-po-wall></div>
             <p class="po-wall-empty hidden" id="poWallEmpty">墙上还空着。第一个寄信的人，第一张票就是他的。</p>
+
+            <!-- 搜索/筛选生效时换成列表，这里不出现票 -->
+            <div class="po-find-list hidden" id="poFindList"></div>
+            <div class="po-find-empty hidden" id="poFindEmpty">
+              <p>没有找到这样的信。</p>
+              <button class="po-btn po-btn--sm" type="button" id="poFindReset">清空条件，看全部</button>
+            </div>
           </section>
 
           <!-- 动态统计：数字由 js/letters.js 按真实来信算，进这一页时重新滚一次 -->

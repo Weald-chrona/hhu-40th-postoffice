@@ -403,6 +403,216 @@ body.po-on-home .footer {
   white-space: nowrap;
 }
 
+/* ---------- 找信 ----------
+   一行搜索 + 一组年代 + 两个排序。刻意用「纸」的质感（米白底、细边、圆角胶囊），
+   跟下面那面深色墙分开：墙上贴的是展品，这一条是工具。
+   颜色全走变量，七套主题换色时它自己跟上。 */
+.po-find {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.po-find-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.po-find-search {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.po-find-icon {
+  position: absolute;
+  left: 13px;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+#poFindInput {
+  width: 100%;
+  padding: 10px 34px 10px 35px;
+  border: 1px solid var(--po-edge);
+  border-radius: 999px;
+  background: var(--po-paper);
+  color: var(--po-ink);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#poFindInput::placeholder {
+  color: #a89c8a;
+  letter-spacing: 0.02em;
+}
+
+#poFindInput:focus {
+  outline: none;
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgba(217, 164, 65, 0.16);
+}
+
+/* type=search 在 Safari 会自带一个清除叉，和下面这个自己画的挤在一起 */
+#poFindInput::-webkit-search-cancel-button,
+#poFindInput::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.po-find-clear {
+  position: absolute;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(74, 64, 54, 0.12);
+  color: var(--po-ink);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.po-find-clear:hover {
+  background: rgba(74, 64, 54, 0.24);
+}
+
+.po-find-sort {
+  flex: 0 0 auto;
+  display: flex;
+  border: 1px solid var(--po-edge);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--po-paper);
+}
+
+.po-find-sortbtn {
+  border: 0;
+  background: none;
+  padding: 9px 13px;
+  font-family: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.po-find-sortbtn.is-on {
+  background: var(--blue-700);
+  color: #fff;
+}
+
+.po-find-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.po-chip {
+  border: 1px solid var(--po-edge);
+  border-radius: 999px;
+  background: transparent;
+  padding: 5px 12px;
+  font-family: inherit;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.18s ease, color 0.18s ease, background 0.18s ease;
+}
+
+.po-chip i {
+  font-style: normal;
+  font-size: 11px;
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+.po-chip:hover {
+  border-color: var(--gold-deep);
+  color: var(--blue-700);
+}
+
+.po-chip.is-on {
+  background: var(--blue-700);
+  border-color: var(--blue-700);
+  color: #fff;
+}
+
+.po-chip.is-on i {
+  opacity: 0.75;
+}
+
+/* 一搜就换列表：墙是「看全部」，列表是「找那一封」 */
+.po-wall.is-list .po-wall-board,
+.po-wall.is-list .po-wall-empty {
+  display: none;
+}
+
+.po-find-list {
+  display: grid;
+  gap: 16px;
+}
+
+.po-find-more {
+  margin: 0;
+  padding: 6px 0 2px;
+  text-align: center;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.po-find-empty {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 40px 22px;
+  border: 1px dashed var(--po-edge);
+  border-radius: 10px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13.5px;
+  letter-spacing: 0.05em;
+}
+
+.po-find-empty p {
+  margin: 0;
+}
+
+/* 这一封是从哪个年代来的。搜索结果跨年代，光有「2016 级」不够 */
+.po-letter-box {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--blue-600);
+  color: #fff;
+  white-space: nowrap;
+}
+
+mark.po-hl {
+  background: rgba(217, 164, 65, 0.38);
+  color: inherit;
+  padding: 0 1px;
+  border-radius: 2px;
+}
+
 .po-wall-board {
   /* 墙色只在这里写一次：齿孔要「挖」出墙色，靠 --st-notch 递下去 */
   --wall: #0c2135;
@@ -1578,6 +1788,35 @@ body.po-modal-open {
   transform: translate(-50%, 0);
 }
 
+/* ---------- 黑金主题下的「深底深字」 ----------
+   七套主题里只有 noir 是深底（#1c1c1c），偏偏它又把 --blue-700 换成了 #1a1a1a，
+   于是所有写 color: var(--blue-700) 的标题在它下面等于隐形 —— 切到黑金再进
+   「看看我们的青春」，大标题直接消失。这里只翻那些**贴在页面底色上**的文字；
+   统计条和宣导框自己带米黄/白底，深字在上面本来就是对的，不能跟着翻。 */
+[data-theme="noir"] .po-hero-title,
+[data-theme="noir"] .po-page-title,
+[data-theme="noir"] .po-wall-title,
+[data-theme="noir"] .po-hero-btn--ghost {
+  color: var(--ink);
+}
+
+[data-theme="noir"] .po-hero-btn--ghost {
+  border-color: var(--line);
+}
+
+[data-theme="noir"] .po-back:hover,
+[data-theme="noir"] .po-chip:hover {
+  color: var(--gold-soft);
+}
+
+/* 选中的胶囊原本是深蓝底，在深底上只剩下一个字，看不出选中 —— 黑金改成金底深字 */
+[data-theme="noir"] .po-chip.is-on,
+[data-theme="noir"] .po-find-sortbtn.is-on {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1a1a;
+}
+
 /* ---------- 小工具 ---------- */
 .hidden {
   display: none !important;
@@ -1586,6 +1825,24 @@ body.po-modal-open {
 /* ---------- 响应式 ---------- */
 @media (max-width: 900px) {
   .po-mailboxes { grid-template-columns: repeat(2, 1fr); }
+
+  /* 七个年代胶囊排两行太占地方，手机上改成一行横滑：
+     滑得动、也看得见后面还有，比换行更像个筛选项 */
+  .po-find-chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .po-find-chips::-webkit-scrollbar { display: none; }
+
+  .po-chip { flex: 0 0 auto; }
+
+  .po-find-bar { gap: 8px; }
+
+  .po-find-sortbtn { padding: 9px 11px; font-size: 12px; }
 
   /* 手机上内容必然比一屏长，首页也放开高度、回到正常文档流 */
   #blessings[data-po-view="home"] {
