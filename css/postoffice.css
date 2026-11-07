@@ -1506,12 +1506,76 @@ body.po-modal-open {
 }
 
 /* 邮票浮层底部的两个按钮：保存是主行动，收下是次要 */
+/* 三个按钮排不进 380px 的浮层：主按钮独占一行，两个次要的并排 */
 .po-stamp-actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: center;
   width: 100%;
   margin-top: 6px;
+}
+
+.po-stamp-actions .po-btn {
+  flex: 1 1 100%;
+  white-space: nowrap;
+}
+
+.po-stamp-actions .po-btn--ghost {
+  flex: 1 1 0;
+  padding: 9px 12px;
+  font-size: 13px;
+}
+
+/* ---------- 手机上的存图浮层 ----------
+   iOS 的 <a download> 不生效，只能把图摊开让人长按。
+   图按屏幕高度收着，不然 1080 × 2000 的长图会顶出屏幕。 */
+.po-modal-card--shot {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--po-paper);
+  border: 1px solid var(--po-edge);
+}
+
+.po-card-shot-img {
+  width: 100%;
+  max-height: 68vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 14px 34px -18px rgba(6, 27, 51, 0.7);
+}
+
+.po-card-shot-tip {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--blue-600);
+}
+
+/* ---------- 一句提示 ---------- */
+.po-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 40px;
+  z-index: 1200;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: rgba(16, 28, 44, 0.92);
+  color: #f6f2e6;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: none;
+}
+
+.po-toast.is-on {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 /* ---------- 小工具 ---------- */

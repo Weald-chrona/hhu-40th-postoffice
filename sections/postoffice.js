@@ -178,9 +178,10 @@
         <div class="po-modal-card po-modal-card--stamp">
           <button class="po-modal-x" type="button" data-po-dismiss="stamp" aria-label="关闭">&times;</button>
           <div class="po-stamp-card" id="poStampCard"></div>
-          <p class="po-stamp-tip" id="poStampTip">右键或长按这张邮票也能保存</p>
+          <p class="po-stamp-tip" id="poStampTip">存成一封信，就能发给没来现场的同学</p>
           <div class="po-stamp-actions">
-            <button class="po-btn" id="poStampSave" type="button">保存这张邮票</button>
+            <button class="po-btn" id="poStampCard" type="button">保存这封信</button>
+            <button class="po-btn po-btn--ghost" id="poStampSave" type="button">只存邮票</button>
             <button class="po-btn po-btn--ghost" id="poStampClose" type="button">收下，继续看信</button>
           </div>
         </div>

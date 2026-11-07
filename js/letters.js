@@ -736,6 +736,7 @@
                  '♥ ' + (l.likes || 0) + ' 个赞' +
                '</button>' +
                '<button class="po-act" data-act="reply" data-id="' + esc(l.id) + '">回复</button>' +
+               '<button class="po-act" data-act="card" data-id="' + esc(l.id) + '">存图</button>' +
              '</div>' +
              replyHTML +
            '</article>';
@@ -1329,7 +1330,7 @@
     if (els.stampTip) {
       els.stampTip.textContent = r.gold
         ? '这一格的第 ' + stampRank(row) + ' 封，烫金特别版'
-        : '右键或长按这张邮票也能保存';
+        : '存下来是一张长图，正文也在里面';
     }
 
     openModal(els.stampWrap);
@@ -1344,6 +1345,10 @@
      画布 600 × 380，按设备像素比放大再缩，避免高分屏上发虚。 */
   var stampRow = null;
 
+  /* 收尾标点不能起一行。断行时撞上这些字，就让它挤回上一行，
+     宁可超出半个字宽 —— 中文排版里「。」单占一行是最扎眼的那种错 */
+  var NO_LINE_START = '，。、；：！？）》」』”’…';
+
   /** 中文折行：canvas 没有现成的换行 API，只能逐字量宽度 */
   function wrapLines(g, text, maxWidth, maxLines) {
     var lines = [];
@@ -1353,6 +1358,7 @@
       var ch = text.charAt(i);
       if (ch === '\n') { lines.push(line); line = ''; continue; }
       if (line && g.measureText(line + ch).width > maxWidth) {
+        if (NO_LINE_START.indexOf(ch) >= 0) { line += ch; continue; }
         lines.push(line);
         line = ch;
         if (lines.length === maxLines) { i++; break; }   // 排满了，剩下的字塞不进去
@@ -1368,7 +1374,7 @@
     return lines;
   }
 
-  function drawStamp(row) {
+  function drawStamp(row, opt) {
     var W = 600, H = 380;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var c = document.createElement('canvas');
@@ -1494,8 +1500,10 @@
 
     }
 
-    // 齿孔：沿四条边每隔 24px 挖掉一个半径 8 的圆
-    g.fillStyle = '#ffffff';
+    /* 齿孔：沿四条边每隔 24px 挖掉一个半径 8 的圆。
+       挖成白色是因为页面背景是白的；贴到信卡上时得换成纸色，
+       否则整圈齿孔像被刀片划了一排白口子（见 drawCard 传进来的 opt.hole）。 */
+    g.fillStyle = (opt && opt.hole) || '#ffffff';
     var step = 24, x, y;
     function punch(px, py) { g.beginPath(); g.arc(px, py, 8, 0, Math.PI * 2); g.fill(); }
     for (x = 0; x <= W; x += step) { punch(x, 0); punch(x, H); }
@@ -1680,6 +1688,305 @@
     }
   }
 
+  /* ============================================================
+     4.4c 把一整封信导出成竖版长图
+     ------------------------------------------------------------
+     邮票只能印一句摘录（QUOTE_MAX 28 字），发给别人看到的是一张票，不是这封信。
+     这里按同一套纸色把信重排一遍：抬头、邮票、正文、落款、印章，
+     一张 1080 宽的长图，存下来直接发群里。
+
+     高度按正文行数算，不写死 3:4 —— 500 字的信硬塞进固定高度就得截字，
+     宁可用一张更长的图。
+     ============================================================ */
+  var CARD_W = 1080;
+  var CARD_FONT = '"Kaiti SC","KaiTi","STKaiti","Microsoft YaHei",serif';
+  var CARD_TITLE_FONT = '"Songti SC","SimSun","Noto Serif SC",serif';
+
+  /** '2026-11-06T12:30:00Z' → '2026.11.06'；拿不到就退回今天 */
+  function absDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) d = new Date();
+    var p = function (x) { return x < 10 ? '0' + x : '' + x; };
+    return d.getFullYear() + '.' + p(d.getMonth() + 1) + '.' + p(d.getDate());
+  }
+
+  /** 落款用中文日期：二〇二六年十一月六日 */
+  function cnDate() {
+    var d = new Date();
+    var n = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+    function day(x) {
+      if (x < 10) return n[x];
+      if (x === 10) return '十';
+      if (x < 20) return '十' + n[x % 10];
+      return n[Math.floor(x / 10)] + '十' + (x % 10 ? n[x % 10] : '');
+    }
+    return String(d.getFullYear()).split('').map(function (ch) { return n[+ch]; }).join('') +
+           '年' + day(d.getMonth() + 1) + '月' + day(d.getDate()) + '日';
+  }
+
+  function drawCard(row) {
+    var W = CARD_W, M = 88, CW = W - M * 2;
+    var gold = isSpecialStamp(row);
+    var pal = gold ? GOLD : palOf(row);
+    var b = boxById(row.mailbox) || { title: '' };
+
+    /* 先量后画：正文排几行要等字体定下来才知道，量完再定画布高度 */
+    var probe = document.createElement('canvas').getContext('2d');
+    if (!probe) return null;
+    var BODY = 34, LH = 58;
+    probe.font = BODY + 'px ' + CARD_FONT;
+    var lines = wrapLines(probe, row.content || '', CW, 9999);
+
+    var HEAD = 600, FOOT = 500;
+    var H = Math.max(1280, HEAD + lines.length * LH + FOOT);
+
+    var c = document.createElement('canvas');
+    c.width = W;
+    c.height = H;
+    var g = c.getContext('2d');
+    if (!g) return null;
+
+    // 纸底
+    g.fillStyle = pal.paper;
+    g.fillRect(0, 0, W, H);
+
+    /* 水彩：跟票面吃同一份 washFor。半径按宽度换算，长图上下拉开也不会散成一片雾 */
+    var wash = washFor(pal);
+    for (var w = 0; w < wash.length; w++) {
+      var bl = wash[w];
+      var bx = bl.x * W, by = bl.y * H, br = bl.r * W;
+      var grad = g.createRadialGradient(bx, by, 0, bx, by, br);
+      grad.addColorStop(0, 'rgba(' + bl.c + ',' + bl.a + ')');
+      grad.addColorStop(1, 'rgba(' + bl.c + ',0)');
+      g.fillStyle = grad;
+      g.fillRect(0, 0, W, H);
+    }
+
+    // 纸纤维
+    var tile = grainTile();
+    if (tile) {
+      g.save();
+      g.globalAlpha = 0.5;
+      g.globalCompositeOperation = 'multiply';
+      g.fillStyle = g.createPattern(tile, 'repeat');
+      g.fillRect(0, 0, W, H);
+      g.restore();
+    }
+
+    // 四边压暗（长图用椭圆，不然上下两角黑得像没印好）
+    var vig = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.30,
+                                     W / 2, H / 2, Math.max(W, H) * 0.66);
+    vig.addColorStop(0, 'rgba(120,96,60,0)');
+    vig.addColorStop(1, hexA(VIGNETTE.hex, VIGNETTE.a * (pal.age || 1) * 0.9));
+    g.fillStyle = vig;
+    g.fillRect(0, 0, W, H);
+
+    // ---------- 抬头 ----------
+    g.textBaseline = 'alphabetic';
+    g.textAlign = 'left';
+    g.fillStyle = pal.ink;
+    g.globalAlpha = 0.9;
+    g.font = 'bold 30px ' + CARD_TITLE_FONT;
+    g.fillText('四十号邮局', M, 110);
+
+    g.globalAlpha = 0.5;
+    g.font = '17px "Microsoft YaHei", sans-serif';
+    g.fillText('河海大学信息科学与工程学院 · 四秩砺行 信领新途', M, 142);
+
+    g.textAlign = 'right';
+    g.globalAlpha = 0.45;
+    g.font = '16px "Microsoft YaHei", sans-serif';
+    g.fillText(stampNo(row.id), W - M, 142);
+    g.textAlign = 'left';
+
+    g.globalAlpha = 1;
+    g.strokeStyle = hexA(pal.ink, 0.2);
+    g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(M, 172);
+    g.lineTo(W - M, 172);
+    g.stroke();
+
+    /* ---------- 邮票 ----------
+       贴上去的那张就是同一个 drawStamp 画出来的，不是另画一版。
+       唯一的区别是齿孔：票面上挖空的是白纸（页面背景是白的），
+       贴在信纸上得挖成纸色偏暗一点，齿孔才看得出是「撕下来的」。 */
+    var stamp = drawStamp(row, { hole: mixHex(pal.paper, '#000000', 0.07) });
+    if (stamp) {
+      var sw = 380, sh = sw * 380 / 600;
+      g.save();
+      g.translate(W - M - sw / 2, 196 + sh / 2);
+      g.rotate(-4 * Math.PI / 180);
+      g.shadowColor = hexA('#3B2E18', 0.26);
+      g.shadowBlur = 26;
+      g.shadowOffsetY = 10;
+      g.drawImage(stamp, -sw / 2, -sh / 2, sw, sh);
+      g.restore();
+    }
+
+    // ---------- 年代标题 ----------
+    g.fillStyle = pal.deep;
+    g.font = 'bold 56px ' + CARD_TITLE_FONT;
+    g.fillText(b.title || '四十号邮局', M, 512);
+
+    g.fillStyle = pal.ink;
+    g.globalAlpha = 0.55;
+    g.font = '22px "Microsoft YaHei", sans-serif';
+    var meta = [];
+    if (row.grad_year) meta.push(yearText(row));
+    meta.push('写于 ' + absDate(row.created_at));
+    g.fillText(meta.join(' · '), M, 552);
+    g.globalAlpha = 1;
+
+    g.strokeStyle = hexA(pal.ink, 0.2);
+    g.beginPath();
+    g.moveTo(M, 586);
+    g.lineTo(W - M, 586);
+    g.stroke();
+
+    // ---------- 正文 ----------
+    var y0 = HEAD + 46;
+    g.font = BODY + 'px ' + CARD_FONT;
+    g.fillStyle = pal.ink;
+    g.globalAlpha = 0.92;
+    for (var i = 0; i < lines.length; i++) {
+      g.fillText(lines[i], M, y0 + i * LH);
+    }
+    g.globalAlpha = 1;
+
+    /* ---------- 落款 ----------
+       信尾留白比行距再多一点（80），不然字贴着名字像挤在角落 */
+    var sigY = y0 + lines.length * LH + 80 - LH;
+    g.textAlign = 'right';
+    g.fillStyle = pal.ink;
+    g.globalAlpha = 0.9;
+    g.font = '26px ' + CARD_FONT;
+    var from = (row.author_name || '匿名') +
+               (row.grad_year ? '（' + yearText(row) + '）' : '');
+    g.fillText('—— ' + from, W - M, sigY);
+
+    g.globalAlpha = 0.5;
+    g.font = '20px ' + CARD_FONT;
+    g.fillText(cnDate(), W - M, sigY + 42);
+    g.globalAlpha = 1;
+    g.textAlign = 'left';
+
+    /* ---------- 印章 ----------
+       朱红小方印压在左下角空白处。字少了会被当成 logo，所以只盖「四秩」两个字，
+       竖排 —— 横排的方块看着像二维码。 */
+    var seal = 96, sx = W - M - 96, sy = sigY + 78;
+    g.save();
+    g.globalAlpha = 0.78;
+    g.strokeStyle = pal.post;
+    g.lineWidth = 5;
+    g.strokeRect(sx, sy, seal, seal);
+    g.fillStyle = pal.post;
+    g.font = 'bold 34px ' + CARD_TITLE_FONT;
+    g.textAlign = 'center';
+    g.fillText('四', sx + seal / 2, sy + 42);
+    g.fillText('秩', sx + seal / 2, sy + 82);
+    g.restore();
+    g.textAlign = 'left';
+
+    // ---------- 页脚 ----------
+    g.strokeStyle = hexA(pal.ink, 0.18);
+    g.lineWidth = 1;
+    g.beginPath();
+    g.moveTo(M, H - 190);
+    g.lineTo(W - M, H - 190);
+    g.stroke();
+
+    g.fillStyle = pal.ink;
+    g.textAlign = 'center';
+    g.globalAlpha = 0.5;
+    g.font = '20px "Microsoft YaHei", sans-serif';
+    g.fillText('河海大学信息科学与工程学院 · 办学四十周年 · 四十号邮局', W / 2, H - 140);
+    g.globalAlpha = 0.38;
+    g.font = '17px "Microsoft YaHei", sans-serif';
+    g.fillText('weald-chrona.github.io/hhu-40th-postoffice', W / 2, H - 104);
+    g.textAlign = 'left';
+    g.globalAlpha = 1;
+
+    return c;
+  }
+
+  /* 存图：桌面上直接下载；iOS 上 <a download> 不生效，改成把图摊在浮层里让人长按 */
+  function canDownload() {
+    var a = document.createElement('a');
+    return typeof a.download !== 'undefined' &&
+           !/iPad|iPhone|iPod/.test(navigator.userAgent) &&
+           !(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  }
+
+  function saveCard(row, say) {
+    say = say || toast;
+    var c = drawCard(row);
+    if (!c) { say('这个浏览器导出不了图片，截图也一样。'); return; }
+
+    /* 存 jpg 不存 png：整张卡是实底的，PNG 存下来快 6MB —— 纸纹和颗粒全是细节，
+       压不动。jpg 质量 0.92 出来六百来 KB，发群里也吃得下。 */
+    var url;
+    try { url = c.toDataURL('image/jpeg', 0.92); }
+    catch (e) { say('导出失败了，直接截图也一样。'); return; }
+
+    if (!canDownload()) { showCardPreview(url); return; }
+
+    try {
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = '四秩时光邮局-信卡-' + stampNo(row.id) + '.jpg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      say('信卡已经存好了，去下载目录看看。');
+    } catch (e) {
+      showCardPreview(url);
+    }
+  }
+
+  /* 手机上的兜底：图摊开、提示长按。这个浮层只在这里用，所以现建现拆 */
+  function showCardPreview(url) {
+    var wrap = document.createElement('div');
+    wrap.className = 'po-modal po-card-shot';
+    wrap.innerHTML =
+      '<div class="po-modal-backdrop" data-shot-close></div>' +
+      '<div class="po-modal-card po-modal-card--shot">' +
+        '<p class="po-card-shot-tip">长按图片保存到相册</p>' +
+        '<img class="po-card-shot-img" alt="这封信的长图" src="' + url + '" />' +
+        '<button class="po-btn po-btn--ghost" type="button" data-shot-close>知道了</button>' +
+      '</div>';
+    document.body.appendChild(wrap);
+    document.body.classList.add('po-modal-open');
+
+    wrap.addEventListener('click', function (e) {
+      if (!e.target.closest('[data-shot-close]')) return;
+      wrap.remove();
+      /* 拆信台可能还开着：等所有浮层都收了，再放右下角的主题按钮出来 */
+      if (!document.querySelector('.po-modal:not(.hidden)')) {
+        document.body.classList.remove('po-modal-open');
+      }
+    });
+  }
+
+  /* 一句话提示：存图这类动作没有固定的位置能显示结果 */
+  var toastEl = null, toastTimer = 0;
+  function toast(msg) {
+    if (!toastEl) {
+      toastEl = document.createElement('div');
+      toastEl.className = 'po-toast';
+      toastEl.setAttribute('role', 'status');
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toastEl.classList.remove('is-on'); }, 2400);
+  }
+
+  /* 截图脚本要单独拿到画好的长图，页面里没有第二个入口；
+     地址栏带 ?debug=1 时才挂上去，正常访问不受影响 */
+  if (/[?&]debug=1/.test(location.search)) window.__poCard = drawCard;
+
   function toggleReplyForm(letterEl) {
     var exist = letterEl.querySelector('.po-reply-form');
     if (exist) { exist.remove(); return; }
@@ -1749,6 +2056,12 @@
         store.like(id, function () { refresh(); setTimeout(function () { if (state.box) openBox(state.box); }, 60); });
       } else if (act === 'reply') {
         toggleReplyForm(btn.closest('.po-letter'));
+      } else if (act === 'card') {
+        var row = null;
+        for (var k = 0; k < state.letters.length; k++) {
+          if (state.letters[k].id === id) { row = state.letters[k]; break; }
+        }
+        if (row) saveCard(row);
       }
     });
 
@@ -1815,6 +2128,10 @@
       if (box) openBox(box);
     });
     document.getElementById('poStampSave').addEventListener('click', saveStamp);
+    document.getElementById('poStampCard').addEventListener('click', function () {
+      if (!stampRow) return;
+      saveCard(stampRow, function (msg) { if (els.stampTip) els.stampTip.textContent = msg; });
+    });
     // 内容边写边查，命中不合适的词就提前把「寄出」禁掉（防抖，别每敲一个字跑一遍）
     var checkTimer = null;
     els.content.addEventListener('input', function () {
