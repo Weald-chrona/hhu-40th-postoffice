@@ -9,7 +9,7 @@
     <section class="section" id="alumni">
       <div class="container">
         <div class="section-head reveal">
-          <span class="section-kicker">03 / ALUMNI</span>
+          <span class="section-kicker">04 / ALUMNI</span>
           <h2 class="section-title">校友风采</h2>
           <p class="section-desc">四十年，他们从这里出发。</p>
         </div>
@@ -43,7 +43,7 @@
 
         <div class="alumni-grid" id="alumniGrid" data-view="grid">
           <article class="alumni-card reveal" data-group="g3">
-            <img class="alumni-avatar" src="images/alumni-1.jpg" alt="校友吴思梦" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-1.jpg" alt="校友吴思梦" />
             <div class="alumni-body">
               <h3>吴思梦</h3>
               <p class="alumni-meta">2021 级 · 电子科学与技术</p>
@@ -52,7 +52,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g3">
-            <img class="alumni-avatar" src="images/alumni-2.jpg" alt="校友朱立超" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-2.jpg" alt="校友朱立超" />
             <div class="alumni-body">
               <h3>朱立超</h3>
               <p class="alumni-meta">2021 级 · 通信工程</p>
@@ -61,7 +61,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g3">
-            <img class="alumni-avatar" src="images/alumni-3.jpg" alt="校友朱胡悦" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-3.jpg" alt="校友朱胡悦" />
             <div class="alumni-body">
               <h3>朱胡悦</h3>
               <p class="alumni-meta">2020 级 · 通信工程</p>
@@ -70,7 +70,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g3">
-            <img class="alumni-avatar" src="images/alumni-4.jpg" alt="校友于力涵" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-4.jpg" alt="校友于力涵" />
             <div class="alumni-body">
               <h3>于力涵</h3>
               <p class="alumni-meta">2020 级 · 通信工程</p>
@@ -79,7 +79,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g2">
-            <img class="alumni-avatar" src="images/alumni-5.jpg" alt="校友江龙韬" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-5.jpg" alt="校友江龙韬" />
             <div class="alumni-body">
               <h3>江龙韬</h3>
               <p class="alumni-meta">2019 级 · 通信工程</p>
@@ -88,7 +88,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g2">
-            <img class="alumni-avatar" src="images/alumni-9.jpg" alt="校友陈旭" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-9.jpg" alt="校友陈旭" />
             <div class="alumni-body">
               <h3>陈旭</h3>
               <p class="alumni-meta">2019 级 · 通信工程</p>
@@ -97,7 +97,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g2">
-            <img class="alumni-avatar" src="images/alumni-8.jpg" alt="校友陈婧怡" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-8.jpg" alt="校友陈婧怡" />
             <div class="alumni-body">
               <h3>陈婧怡</h3>
               <p class="alumni-meta">2016 级 · 通信工程</p>
@@ -106,7 +106,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g1">
-            <img class="alumni-avatar" src="images/alumni-6.jpg" alt="校友秦奋" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-6.jpg" alt="校友秦奋" />
             <div class="alumni-body">
               <h3>秦奋</h3>
               <p class="alumni-meta">2002 级 · 通信工程</p>
@@ -115,7 +115,7 @@
           </article>
 
           <article class="alumni-card reveal" data-group="g1">
-            <img class="alumni-avatar" src="images/alumni-7.jpg" alt="校友段永华" />
+            <img class="alumni-avatar" loading="lazy" decoding="async" src="images/alumni-7.jpg" alt="校友段永华" />
             <div class="alumni-body">
               <h3>段永华</h3>
               <p class="alumni-meta">1999 级 · 电子信息工程</p>

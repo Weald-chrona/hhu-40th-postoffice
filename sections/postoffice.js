@@ -21,7 +21,7 @@
           <div class="po-hero-art" aria-hidden="true"></div>
           <div class="container po-hero-inner">
             <div class="po-hero-text">
-              <span class="po-hero-kicker">04 / Post Office　四十号邮局</span>
+              <span class="po-hero-kicker">01 / POST OFFICE · 四十号邮局</span>
               <p class="po-hero-dept">河海大学信息科学与工程学院</p>
               <p class="po-hero-years">1986 — 2026　·　办学四十周年</p>
               <h1 class="po-hero-title">凤凰花开时，<br />我想要寄出一封信。</h1>

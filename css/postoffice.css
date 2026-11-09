@@ -1834,13 +1834,26 @@ body.po-modal-open {
     padding-bottom: 4px;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    /* 右边留一道渐隐：不然最后一个胶囊被屏幕切一半，看着像排版出错，
+       加了这道白才读得出「右边还有，可以划」 */
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 26px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 26px), transparent 100%);
   }
 
   .po-find-chips::-webkit-scrollbar { display: none; }
 
   .po-chip { flex: 0 0 auto; }
 
-  .po-find-bar { gap: 8px; }
+  /* 搜索框和排序按钮在 390 宽下挤成一排，输入框只剩 230px，
+     提示语被截掉一半。窄屏改成两行：搜索框独占一行，排序靠右。 */
+  .po-find-bar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .po-find-search { flex: 1 1 100%; }
+
+  .po-find-sort { margin-left: auto; }
 
   .po-find-sortbtn { padding: 9px 11px; font-size: 12px; }
 

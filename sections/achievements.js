@@ -9,7 +9,7 @@
     <section class="section section--alt" id="achievements">
       <div class="container">
         <div class="section-head">
-          <span class="section-kicker">02 / DISCIPLINE</span>
+          <span class="section-kicker">03 / DISCIPLINE</span>
           <h2 class="section-title">学科成果</h2>
           <p class="section-desc">从无线电专业到一级学科博士点，一条完整的信息学科成长线。</p>
         </div>
@@ -19,7 +19,7 @@
             <b>“信息与通信工程”学科关键技术的创新基地</b>，水利行业信息与通信工程的引领者。</p>
 
           <p class="disc-facts">
-            <span><b>40</b> 年建院历程</span>
+            <span><b>40</b> 年办学历程</span>
             <span><b>3</b> 个博士阶段学位点</span>
             <span><b>4</b> 个学科方向</span>
             <span><b>9</b> 个省市级科技平台</span>

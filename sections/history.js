@@ -9,7 +9,7 @@
     <section class="section" id="history">
       <div class="container">
         <div class="section-head reveal">
-          <span class="section-kicker">01 / HISTORY</span>
+          <span class="section-kicker">02 / HISTORY</span>
           <h2 class="section-title">院史时间轴</h2>
           <p class="section-desc">从无线电专业到信息科学与工程学院，七次跨越。每一次更名，都是一次学科版图的重新划定。</p>
         </div>
@@ -115,7 +115,7 @@
               <div class="timeline-body">
                 <span class="timeline-year">2026</span>
                 <h3>新程 · 四秩风华</h3>
-                <p>建院四十周年，站在新起点，面向智能时代再启新程。</p>
+                <p>办学四十周年，站在新起点，面向智能时代再启新程。</p>
               </div>
             </div>
           </li>
@@ -146,10 +146,14 @@
     void panel.offsetHeight;   /* 强制回流，让浏览器确认这个起点 */
 
     requestAnimationFrame(function () {
-      /* 第二步：恢复过渡，重新排好错落延迟 */
+      /* 第二步：恢复过渡，重新排好错落延迟。
+         原来是 i * 0.95 秒：七条排下来最后一条要等 5.7 秒，而这段延迟是从
+         「切进本板块」那刻开始算的 —— 用户滚到时间轴末尾时，第六、第七条
+         还是透明的，看上去就是两块空卡片。0.26 秒一档，整组 2 秒内走完，
+         逐条浮现的节奏还在，滚到哪儿都不会撞见空白。 */
       items.forEach(function (el, i) {
         el.style.transition = "";
-        el.style.transitionDelay = Math.min(i * 0.95, 7) + "s";
+        el.style.transitionDelay = Math.min(i * 0.26, 2.4) + "s";
       });
 
       requestAnimationFrame(function () {

@@ -1088,6 +1088,15 @@
         ? '最热闹的是「' + d.hot.title + '」，已经攒了 ' + d.hotN + ' 封信。'
         : '还没有人投信，第一封会是谁的？';
     }
+
+    /* 一句话跟着信数换。原来写死「读了这么多，有没有一句话是你想留下的？」，
+       可空库时墙上一封都没有，上面刚说完「还没有人投信」，底下来一句「读了这么多」，
+       两句话当面打架。 */
+    if (els.ctaText) {
+      els.ctaText.textContent = d.letters
+        ? '读了这么多，有没有一句话是你想留下的？'
+        : '墙上还空着。第一封信，可以是你的。';
+    }
   }
 
   /* ============================================================
@@ -2512,6 +2521,7 @@
     els.stampTip = document.getElementById('poStampTip');
     els.stats = document.getElementById('poStats');
     els.statsNote = document.getElementById('poStatsNote');
+    els.ctaText = document.querySelector('.po-cta-text');
     els.wall = document.querySelector('[data-po-wall]');
     els.wallCount = document.getElementById('poWallCount');
     els.wallEmpty = document.getElementById('poWallEmpty');
