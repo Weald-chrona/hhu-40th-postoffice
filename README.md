@@ -6,7 +6,7 @@
 表达形式：画轴？
 
 二，学科与成果
-数据图表展示？（这个有待商榷）
+数据图表展示
 
 三：校友风采
 
@@ -21,11 +21,11 @@
 
 ### 每个人负责哪一块
 
-| 负责人 | 分支 | 板块 | 你只需要改这些文件 |
+| 负责人 | 分支 | 板块 | 
 |---|---|---|---|
-| 队友 A | `feat/history-timeline` | 一、院史时间轴 | `sections/history.js`、`css/history.css` |
-| 队友 B | `feat/achievements-alumni` | 二、学科成果 + 三、校友风采 | `sections/achievements.js`、`sections/alumni.js`、`css/achievements.css`、`css/alumni.css` |
-| 我（组长） | `feat/40th-postoffice` | 四、四十号邮局（动态） | `sections/postoffice.js`、`css/postoffice.css`、`js/letters.js`、`js/config.js`、`supabase/schema.sql` |
+| A | `feat/history-timeline` | 一、院史时间轴 | `sections/history.js`、`css/history.css` |
+| B | `feat/achievements-alumni` | 二、学科成果 + 三、校友风采 | `sections/achievements.js`、`sections/alumni.js`、`css/achievements.css`、`css/alumni.css` |
+| C | `feat/40th-postoffice` | 四、四十号邮局（动态） | `sections/postoffice.js`、`css/postoffice.css`、`js/letters.js`、`js/config.js`、`supabase/schema.sql` |
 
 **一句话原则：自己的活只在自己那几个文件里改，别碰别人的。**
 真要改公共部分（导航栏、页脚、`css/style.css`），先在群里说一声。
@@ -48,7 +48,7 @@ git commit -m "写清楚你改了啥"
 git push
 ```
 
-最后统一由组长把各分支合并回 `dev`。
+最后把各分支合并回 `dev`。
 
 ### 目录结构
 
