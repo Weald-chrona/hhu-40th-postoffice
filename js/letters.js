@@ -1149,18 +1149,43 @@
        封信件已寄出   = 没有 parent_id 的信
        封回信已收到   = 有 parent_id 的回复
        个人记下了文字 = 署名去重后的人数（没署名的算「匿名」一个人）
-     下面那句小结会挑出信最多的那个信箱，所以每次刷新都可能不一样。 */
-  function statData() {
-    var letters = 0, replies = 0, authors = {};
-    state.letters.forEach(function (l) {
-      if (l.parent_id) replies += 1;
-      else letters += 1;
-      authors[(l.author_name || '').trim() || '匿名'] = 1;
+     下面那句小结会挑出信最多的那个信箱，所以每次刷新都可能不一样。
+
+     人数为什么按「署名 + 入学年份」去重：没有账号，同名是常态，
+     两个张三隔着四十年都往纪念墙上留了话，按名字去重会把他们算成一个人。
+     但回信那张表里 grad_year 是空的（写信时才问年份），所以回信先只按名字占位，
+     等把所有主信的名字过完，凡是投过信的名字就从回信那堆里剔掉 ——
+     否则同一个人投一封信再回一嘴，会被数成两个人，数字往大了虚。 */
+  function statData(list) {
+    list = list || state.letters;
+    var letters = 0, replies = 0, people = {}, letterNames = {};
+
+    list.forEach(function (l) {
+      var nm = (l.author_name || '').trim();
+      /* 匿名的没有署名可比，两个人还是一个人都无从判断。沿用原来的口径——
+         留空的和手打「匿名」的都算同一批，统统算一个人，
+         不拿年份把它们拆开来撑大数字。 */
+      var anon = !nm || nm === '匿名';
+      var who = anon ? '' : nm;
+      if (l.parent_id) {
+        replies += 1;
+        people['r\u0001' + who] = 1;
+      } else {
+        letters += 1;
+        people['l\u0001' + (anon ? '' : nm + '\u0001' + (l.grad_year || ''))] = 1;
+        letterNames[who] = 1;
+      }
+    });
+
+    /* 回信那张记录里 grad_year 是空的，只按名字占位。投过信的人已经从上面
+       l: 那组里数过了，这里把重名的 r: 条目删掉，别一个人算两份。 */
+    Object.keys(people).forEach(function (k) {
+      if (k.indexOf('r\u0001') === 0 && letterNames[k.slice(2)]) delete people[k];
     });
 
     var hot = null, hotN = 0;
     BOXES.forEach(function (b) {
-      var n = state.letters.filter(function (l) {
+      var n = list.filter(function (l) {
         return l.mailbox === b.id && !l.parent_id;
       }).length;
       if (n > hotN) { hotN = n; hot = b; }
@@ -1169,7 +1194,7 @@
     return {
       letters: letters,
       replies: replies,
-      people: Object.keys(authors).length,
+      people: Object.keys(people).length,
       hot: hot,
       hotN: hotN
     };
@@ -2261,7 +2286,12 @@
 
   /* 截图脚本要单独拿到画好的长图，页面里没有第二个入口；
      地址栏带 ?debug=1 时才挂上去，正常访问不受影响 */
-  if (/[?&]debug=1/.test(location.search)) window.__poCard = drawCard;
+  if (/[?&]debug=1/.test(location.search)) {
+    window.__poCard = drawCard;
+    /* 统计函数平时只读 state.letters。同名校验要喂假数据进来，
+       所以允许传一个数组，走的还是同一段代码。 */
+    window.__poStat = statData;
+  }
 
   function toggleReplyForm(letterEl) {
     var exist = letterEl.querySelector('.po-reply-form');
