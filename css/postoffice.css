@@ -870,6 +870,42 @@ mark.po-hl {
   letter-spacing: 0.08em;
 }
 
+/* 取信失败的那一块。
+   跟上面的空态区分开：空态是「安静的」，这一块是要人动手的，
+   所以给标题、给原因、给按钮，别让人分不清「没信」和「没取到」 */
+.po-loadfail {
+  padding: 34px 0 26px;
+  text-align: center;
+}
+
+.po-loadfail-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: 0.06em;
+}
+
+.po-loadfail-msg {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.po-loadfail-retry[disabled] {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* 贴在纪念墙位置上那一份。墙的空板这时被 is-empty 收起来了，
+   这块顶上原本板的位置，所以给点上下留白，别贴着标题 */
+.po-wall-fail {
+  margin: 4px 0 10px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 0 18px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
 .po-letter {
   background: var(--po-paper);
   border: 1px solid var(--po-edge);
@@ -1802,6 +1838,12 @@ body.po-modal-open {
 
 [data-theme="noir"] .po-hero-btn--ghost {
   border-color: var(--line);
+}
+
+/* 取信失败那块贴着页面底色，白底在黑金主题下会亮出一块，换成极淡的白 */
+[data-theme="noir"] .po-wall-fail {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 [data-theme="noir"] .po-back:hover,

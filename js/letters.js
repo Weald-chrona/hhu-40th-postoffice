@@ -40,15 +40,30 @@
      1. 存储层
      ============================================================ */
 
+  /* 配了 key 却没能连上时的原因。有值就说明「不是没配后端，是出事了」，
+     这时候不能退到本地模式装没事。 */
+  var backendFailed = null;
+
   function initBackend() {
     var hasKey = CFG.supabaseUrl && CFG.supabaseKey && CFG.supabaseUrl.indexOf('https://') === 0;
-    if (hasKey && typeof window.supabase !== 'undefined') {
-      try {
-        db = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
-        DEMO = false;
-      } catch (e) {
-        DEMO = true;
-      }
+    if (!hasKey) return;   // 真的没配后端，本地演示模式
+
+    /* key 填了、SDK 却没定义，只能是那个脚本自己没取到。
+       以前这里会静默退到 localStorage —— 页面一切正常，
+       但投的信只躺在这台电脑上，换手机就没了。这是最坏的一种错，
+       宁可当场报错让人刷新。 */
+    if (typeof window.supabase === 'undefined') {
+      DEMO = true;
+      backendFailed = '连接组件没加载出来，刷新页面再来一次';
+      return;
+    }
+
+    try {
+      db = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseKey);
+      DEMO = false;
+    } catch (e) {
+      DEMO = true;
+      backendFailed = '连不上服务器：' + (e && e.message ? e.message : '未知原因');
     }
   }
 
@@ -65,20 +80,58 @@
     return 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
 
+  /* 请求最多等多久。Supabase 在东京，会场网络说不准，
+     卡住的时候宁可早点说一句「有点慢」，也别让人对着空白等。 */
+  var TIMEOUT_MS = 8000;
+
+  /* 给一个「回调式」的请求套上超时。
+     run(done) 里发起请求，done(data, err) 交结果。
+     超时先按错误回调一次；真结果晚到了就丢掉，
+     免得已经把提示画出来又被迟到的数据刷回正常，用户看不懂发生了什么。 */
+  function withTimeout(run, cb) {
+    var settled = false;
+    var timer = setTimeout(function () {
+      if (settled) return;
+      settled = true;
+      cb(null, { timeout: true, message: '网络有点慢，等了一会儿没等到回应' });
+    }, TIMEOUT_MS);
+
+    run(function (data, err) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      cb(data, err);
+    });
+  }
+
+  /* 把各种错误（超时、Supabase 报错、网络异常）压成一句人话 */
+  function errText(err, fallback) {
+    if (!err) return fallback;
+    if (err.timeout) return '网络有点慢，等了一会儿没等到回应';
+    if (err.message) return err.message;
+    return fallback;
+  }
+
   var store = {
     /** 取全部信件（含回复），按时间从新到旧 */
     list: function (cb) {
+      if (backendFailed) return cb(null, { message: backendFailed });
       if (DEMO) {
         var all = readLocal().sort(function (a, b) {
           return new Date(b.created_at) - new Date(a.created_at);
         });
         return cb(all, null);
       }
-      db.from('letters')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(500)
-        .then(function (res) { cb(res.data || [], res.error); });
+      withTimeout(function (done) {
+        db.from('letters')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(500)
+          .then(
+            function (res) { done(res.data || [], res.error); },
+            function (e) { done(null, e || { message: '连不上服务器' }); }
+          );
+      }, cb);
     },
 
     /** 投一封信 */
@@ -92,6 +145,7 @@
         likes: 0,
         created_at: new Date().toISOString()
       };
+      if (backendFailed) return cb(null, { message: backendFailed });
       if (DEMO) {
         row.id = newId();
         var list = readLocal();
@@ -99,8 +153,13 @@
         writeLocal(list);
         return cb(row, null);
       }
-      db.from('letters').insert([row]).select().single()
-        .then(function (res) { cb(res.data, res.error); });
+      withTimeout(function (done) {
+        db.from('letters').insert([row]).select().single()
+          .then(
+            function (res) { done(res.data, res.error); },
+            function (e) { done(null, e || { message: '连不上服务器' }); }
+          );
+      }, cb);
     },
 
     /** 回复一封信 */
@@ -114,6 +173,7 @@
         likes: 0,
         created_at: new Date().toISOString()
       };
+      if (backendFailed) return cb(null, { message: backendFailed });
       if (DEMO) {
         row.id = newId();
         var list = readLocal();
@@ -121,12 +181,18 @@
         writeLocal(list);
         return cb(row, null);
       }
-      db.from('letters').insert([row]).select().single()
-        .then(function (res) { cb(res.data, res.error); });
+      withTimeout(function (done) {
+        db.from('letters').insert([row]).select().single()
+          .then(
+            function (res) { done(res.data, res.error); },
+            function (e) { done(null, e || { message: '连不上服务器' }); }
+          );
+      }, cb);
     },
 
     /** 点赞：真实库走 rpc，本地模式直接 +1 */
     like: function (id, cb) {
+      if (backendFailed) return cb({ message: backendFailed });
       if (DEMO) {
         var list = readLocal();
         for (var i = 0; i < list.length; i++) {
@@ -135,7 +201,12 @@
         writeLocal(list);
         return cb(null);
       }
-      db.rpc('like_letter', { letter_id: id }).then(function (res) { cb(res.error); });
+      withTimeout(function (done) {
+        db.rpc('like_letter', { letter_id: id }).then(
+          function (res) { done(null, res.error); },
+          function (e) { done(null, e || { message: '连不上服务器' }); }
+        );
+      }, function (_data, err) { cb(err); });
     }
   };
 
@@ -147,6 +218,14 @@
   function markLiked(id) {
     var s = likedSet();
     s[id] = 1;
+    try { localStorage.setItem(LS_LIKE, JSON.stringify(s)); } catch (e) {}
+  }
+
+  /* 点赞没成功时把本地记号撤掉，否则会变成「显示已赞、库里没加」，
+     而且这颗心再也点不动 */
+  function unmarkLiked(id) {
+    var s = likedSet();
+    delete s[id];
     try { localStorage.setItem(LS_LIKE, JSON.stringify(s)); } catch (e) {}
   }
 
@@ -977,13 +1056,65 @@
     return map;
   }
 
+  /* 取信失败时铺在页面上的那一块：一句人话 + 一个重试按钮。
+     不拿假信顶上 —— 现场屏幕上出现的必须是真数据。
+
+     踩过的坑：这一页真正在显示的是纪念墙的 [data-po-wall]，不是 #poLetters。
+     最早只往 #poLetters 里塞提示，结果墙上只剩一条空深色板，用户什么也看不到。 */
+  function renderLoadError(err) {
+    var wall = document.querySelector('.po-wall');
+    var board = document.querySelector('[data-po-wall]');
+    var slow = !!(err && err.timeout);
+    var title = slow ? '信还在路上' : '信没能取回来';
+
+    function build() {
+      var w = document.createElement('div');
+      w.className = 'po-loadfail';
+      w.innerHTML =
+        '<p class="po-loadfail-title">' + title + '</p>' +
+        '<p class="po-loadfail-msg">' + esc(errText(err, '请稍后再试')) + '。</p>' +
+        '<button class="po-btn po-btn--sm po-loadfail-retry" type="button">再试一次</button>';
+      var btn = w.querySelector('.po-loadfail-retry');
+      btn.addEventListener('click', function () {
+        btn.disabled = true;
+        w.querySelector('.po-loadfail-msg').textContent = '正在重新取信……';
+        refresh();
+      });
+      return w;
+    }
+
+    if (wall) {
+      /* 空板收起来（is-empty 那条规则），空态那句也收起来 ——
+         这会儿是「没取到」，不是「还空着」，两边说法不能打架 */
+      wall.classList.add('is-empty');
+      if (els.wallEmpty) els.wallEmpty.classList.add('hidden');
+      var old = wall.querySelector('.po-loadfail');
+      if (old) old.parentNode.removeChild(old);
+      var fail = build();
+      fail.classList.add('po-wall-fail');
+      if (board) board.insertAdjacentElement('afterend', fail);
+      else wall.appendChild(fail);
+    }
+
+    if (els.letters) {
+      els.letters.innerHTML = '';
+      els.letters.appendChild(build());
+    }
+
+    if (els.statsNote) els.statsNote.textContent = '这次没数上，点「再试一次」';
+  }
+
   function refresh(done) {
     store.list(function (all, err) {
       if (err) {
-        els.letters.innerHTML = '<p class="po-empty">信件加载失败：' + esc(err.message || '未知错误') + '</p>';
+        renderLoadError(err);
         if (done) done();
         return;
       }
+      /* 上一次失败留在墙上的提示块，这回取到信了，清掉 */
+      var stale = document.querySelectorAll('.po-wall-fail');
+      for (var s = 0; s < stale.length; s++) stale[s].parentNode.removeChild(stale[s]);
+
       // 被管理员下架的信不展示。数据库那边 RLS 已经挡了一道，
       // 这里再挡一次是为了兜住缓存、旧数据这类漏网的。
       state.letters = (all || []).filter(function (l) { return l.status !== 'hidden'; });
@@ -1361,7 +1492,7 @@
 
       if (err) {
         refreshSendState();
-        return fail('寄出失败：' + (err.message || '请稍后再试'));
+        return fail('寄出失败：' + errText(err, '请稍后再试'));
       }
 
       hideForm();
@@ -2159,7 +2290,12 @@
       }
       store.reply({ box: (letter && letter.mailbox) || state.box, name: name, content: SENS.mask(text), parentId: id },
         function (row, err) {
-          if (err) return;
+          if (err) {
+            /* 以前这里直接 return，用户点了「回复」什么反应都没有，
+               分不清是发出去了还是没发出去。弱网下这一下最容易出事。 */
+            inputs[1].placeholder = '没发出去：' + errText(err, '再点一次试试');
+            return;
+          }
           refresh();
           // 拆信台关着的话（在搜索结果里回的复）就别把它弹出来
           setTimeout(function () {
@@ -2213,7 +2349,10 @@
       if (act === 'like') {
         if (likedSet()[id]) return;
         markLiked(id);
-        store.like(id, afterAct);
+        store.like(id, function (err) {
+          if (err) { unmarkLiked(id); return; }
+          afterAct();
+        });
       } else if (act === 'reply') {
         toggleReplyForm(btn.closest('.po-letter'));
       } else if (act === 'card') {
@@ -2350,7 +2489,10 @@
       if (box) openBox(box);
     });
     document.getElementById('poStampSave').addEventListener('click', saveStamp);
-    document.getElementById('poStampCard').addEventListener('click', function () {
+    /* 「保存这封信」原来和上面那个 .po-stamp-card 抢同一个 id=poStampCard，
+       getElementById 只认先出现的那个 div —— 点了按钮没反应，点邮票本体反倒存图。
+       按钮改成独立 id，各管各的。 */
+    document.getElementById('poStampSaveCard').addEventListener('click', function () {
       if (!stampRow) return;
       saveCard(stampRow, function (msg) { if (els.stampTip) els.stampTip.textContent = msg; });
     });

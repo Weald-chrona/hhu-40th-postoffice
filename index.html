@@ -6,6 +6,10 @@
   <title>四秩砺行 · 信领新途 ｜ 信息科学与工程学院办学四十周年</title>
   <meta name="description" content="河海大学信息科学与工程学院办学四十周年主题网站：四秩砺行，信领新途。" />
   <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+  <!-- 邮局主页那块手绘主视觉是首屏唯一的大图，但它是由 sections/postoffice.js
+       注入到 DOM 的，浏览器要等脚本跑完才发现。先把地址告诉它，早点开始取 -->
+  <link rel="preload" as="image" href="images/po-head-sketch.jpg" />
   <meta name="theme-color" content="#0B2239" />
   <!-- 分享卡片：微信/群里发链接时显示的那张封面图，必须用绝对地址 -->
   <meta property="og:type" content="website" />
@@ -120,8 +124,11 @@
   <script src="sections/alumni.js"></script>
   <script src="sections/postoffice.js"></script>
 
-  <!-- ↓↓↓ 四十号邮局：CDN 拉不到 Supabase 会自动降级成本地演示模式，页面照常可用 ↓↓↓ -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- ↓↓↓ 四十号邮局 ↓↓↓ -->
+  <!-- 以前从 jsdelivr 取。国内那个源时不时上不来，一旦取不到，
+       js/letters.js 会以为「没配后端」而静默退到本地演示模式 —— 页面看着正常，
+       其实投的信只存在这台机器上。所以改成放进仓库、跟站点一起发。 -->
+  <script src="js/vendor/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/sensitiveWords.js"></script>
   <script src="js/letters.js"></script>

@@ -68,13 +68,20 @@
   function explain(err) {
     if (!err) return '未知错误';
     var code = err.code || '';
+    var msg = err.message || '';
     if (code === '23505') return '这个词已经在库里了。';
-    if (code === '42501' || /row-level security/i.test(err.message || '')) {
+    if (code === '42501' || /row-level security/i.test(msg)) {
       return '数据库拒绝了这次操作：当前账号不在 admins 表里，或者 RLS 策略没跑全。';
     }
     if (code === '42P01') return '表不存在，先跑一遍 supabase/schema.sql。';
-    if (/JWT/i.test(err.message || '')) return '登录已过期，请重新登录。';
-    return err.message || String(err);
+    if (/JWT/i.test(msg)) return '登录已过期，请重新登录。';
+    /* 下面几条平时不出现，真出现的时候人正在着急，更不该给他看英文 */
+    if (/Invalid login credentials/i.test(msg)) return '账号或密码不对。';
+    if (/Email not confirmed/i.test(msg)) return '这个邮箱还没验证，去 Supabase 后台点一下确认。';
+    if (/rate limit|too many requests|after \d+ seconds/i.test(msg)) return '试得太勤了，等一分钟再来。';
+    if (/Failed to fetch|NetworkError|network/i.test(msg)) return '连不上服务器，先看看网络。';
+    if (/Invalid API key/i.test(msg)) return '配置里的 key 不对，检查 js/config.js。';
+    return msg || String(err);
   }
 
   /* ---------- 登录 ---------- */
