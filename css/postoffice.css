@@ -264,7 +264,7 @@ body.po-on-home .footer {
   gap: 8px;
   padding: 12px 30px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #0e4c92, #0b3b6f);
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
   color: #fff;
   font-size: 15px;
   letter-spacing: 0.1em;
@@ -724,7 +724,7 @@ mark.po-hl {
   padding: 26px 22px 22px;
   border-radius: 14px;
   border: 1px solid rgba(11, 59, 111, 0.14);
-  background: linear-gradient(150deg, #0e4c92 0%, #0b3b6f 60%, #072b55 100%);
+  background: linear-gradient(150deg, var(--blue-600) 0%, var(--blue-700) 60%, var(--blue-800) 100%);
   color: #fff;
   cursor: pointer;
   overflow: hidden;
@@ -778,6 +778,10 @@ mark.po-hl {
 
 .po-box-title {
   margin: 0 0 6px;
+  /* 标题是 h3，会被全局的 h1,h2,h3 { color: var(--ink) } 抓走。
+     卡片本身是深色渐变，深色字压上去同一个亮度，差点就看不见了。
+     这里按卡片走白字，跟下面的描述、计数一致。 */
+  color: #fff;
   font-size: 17px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -1037,7 +1041,7 @@ mark.po-hl {
   padding: 10px 20px;
   border-radius: 999px;
   border: 1px solid var(--blue-600);
-  background: linear-gradient(135deg, #0e4c92, #0b3b6f);
+  background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
   color: #fff;
   font-size: 14px;
   letter-spacing: 0.08em;
@@ -1089,7 +1093,7 @@ mark.po-hl {
 .po-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(4, 16, 30, 0.62);
+  background: rgba(var(--veil-rgb), 0.62);
   -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
   animation: po-fade-in 0.22s ease both;

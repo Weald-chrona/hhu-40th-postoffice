@@ -24,6 +24,10 @@
   --shadow-sm: 0 6px 20px -10px rgba(6, 27, 51, 0.35);
   --shadow: 0 24px 60px -28px rgba(6, 27, 51, 0.55);
   --nav-bg: rgba(4, 16, 30, 0.9);
+  /* 照片上那层压暗的底色，写成 RGB 三元组好调透明度。
+     以前直接把 4,16,30 抄在渐变里，换主题时导航变了、蒙版还是深蓝，两截色差明显。
+     每个主题在同名变量里报一遍自己的最深色。 */
+  --veil-rgb: 4, 16, 30;
   --nav-ink: rgba(255, 255, 255, 0.82);
   --nav-ink-hover: #ffffff;
   --nav-hover-bg: rgba(255, 255, 255, 0.08);
@@ -304,7 +308,7 @@ button {
    照片上缘再盖一层深蓝渐变融进去，标题就压在干净的深底上 */
 @media (max-width: 900px) {
   .hero--page {
-    background: #04101e;
+    background: rgb(var(--veil-rgb));
   }
 
   .hero--page .hero-bg {
@@ -327,15 +331,20 @@ button {
     height: 34%;
     background: linear-gradient(
       to bottom,
-      #04101e 0%,
-      rgba(4, 16, 30, 0.72) 46%,
-      rgba(4, 16, 30, 0) 100%
+      rgb(var(--veil-rgb)) 0%,
+      rgba(var(--veil-rgb), 0.72) 46%,
+      rgba(var(--veil-rgb), 0) 100%
     );
   }
 
   /* 照片只占下半，底部白渐变按 hero 全高算会偏厚，压到校名石，改薄一点 */
   .hero--page {
     --hero-fade: 11%;
+  }
+
+  /* 手机上照片占的面积大、又紧挨着标题，那层染色得加重才压得住天空本色 */
+  [data-theme] .hero-overlay::before {
+    background: rgba(var(--veil-rgb), 0.5);
   }
 }
 
@@ -425,12 +434,36 @@ button {
   background:
     linear-gradient(
       90deg,
-      rgba(4, 16, 30, 0.84) 0%,
-      rgba(4, 16, 30, 0.58) 38%,
-      rgba(4, 16, 30, 0.16) 72%,
-      rgba(4, 16, 30, 0.02) 100%
+      rgba(var(--veil-rgb), 0.84) 0%,
+      rgba(var(--veil-rgb), 0.58) 38%,
+      rgba(var(--veil-rgb), 0.16) 72%,
+      rgba(var(--veil-rgb), 0.02) 100%
     ),
-    linear-gradient(180deg, rgba(4, 16, 30, 0.26) 0%, rgba(4, 16, 30, 0.08) 55%, rgba(4, 16, 30, 0.28) 100%);
+    linear-gradient(180deg, rgba(var(--veil-rgb), 0.26) 0%, rgba(var(--veil-rgb), 0.08) 55%, rgba(var(--veil-rgb), 0.28) 100%);
+}
+
+/* 横向渐变右半边几乎透明，照片自己的天空就露出来了。默认主题的天空本来就是深蓝，
+   跟蒙版一个颜色，接得住；换成绿、粉、棕这些主题，那一片还是蓝的，跟左边对不上。
+   所以有主题时把右半边也压厚一点，再加一层很淡的整片染色。
+   两张叠起来之后，整块底色都是一个色系，照片只剩个淡淡的影。
+   默认主题不套这一层，保持原来的观感。 */
+[data-theme] .hero-overlay {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(var(--veil-rgb), 0.84) 0%,
+      rgba(var(--veil-rgb), 0.66) 38%,
+      rgba(var(--veil-rgb), 0.46) 72%,
+      rgba(var(--veil-rgb), 0.34) 100%
+    ),
+    linear-gradient(180deg, rgba(var(--veil-rgb), 0.26) 0%, rgba(var(--veil-rgb), 0.08) 55%, rgba(var(--veil-rgb), 0.28) 100%);
+}
+
+[data-theme] .hero-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--veil-rgb), 0.3);
 }
 
 .hero::after {
@@ -1024,6 +1057,7 @@ button {
   --nav-ink-hover: #ffffff;
   --nav-hover-bg: rgba(255, 255, 255, 0.10);
   --blue-900: #14213d;
+  --veil-rgb: 20, 33, 61;
   --blue-800: #1b2e52;
   --blue-700: #2e4a85;
   --blue-600: #4167b1;
@@ -1045,6 +1079,7 @@ button {
   --nav-ink-hover: #ffffff;
   --nav-hover-bg: rgba(255, 255, 255, 0.10);
   --blue-900: #2a1f24;
+  --veil-rgb: 42, 31, 36;
   --blue-800: #3b2a31;
   --blue-700: #6e4351;
   --blue-600: #ef6078;
@@ -1198,6 +1233,7 @@ body.po-modal-open .theme-panel {
   --nav-ink-hover: #c29d59;
   --nav-hover-bg: rgba(194, 157, 89, 0.16);
   --blue-900: #101010;
+  --veil-rgb: 16, 16, 16;
   --blue-800: #161616;
   --blue-700: #1a1a1a;
   --blue-600: #c29d59;
@@ -1221,6 +1257,7 @@ body.po-modal-open .theme-panel {
   --nav-ink-hover: #fbf7ef;
   --nav-hover-bg: rgba(251, 247, 239, 0.12);
   --blue-900: #2b2420;
+  --veil-rgb: 43, 36, 32;
   --blue-800: #382f29;
   --blue-700: #6b5443;
   --blue-600: #b57743;
@@ -1243,6 +1280,7 @@ body.po-modal-open .theme-panel {
   --nav-ink-hover: #ffffff;
   --nav-hover-bg: rgba(255, 255, 255, 0.12);
   --blue-900: #2b3a2b;
+  --veil-rgb: 43, 58, 43;
   --blue-800: #354835;
   --blue-700: #44603f;
   --blue-600: #567357;
@@ -1277,6 +1315,7 @@ body.po-modal-open .theme-panel {
   --nav-ink-hover: #f8e9a1;
   --nav-hover-bg: rgba(248, 233, 161, 0.14);
   --blue-900: #003049;
+  --veil-rgb: 0, 48, 73;
   --blue-800: #00263a;
   --blue-700: #00405f;
   --blue-600: #d62828;

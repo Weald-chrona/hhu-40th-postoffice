@@ -36,7 +36,7 @@
     align-items: stretch;
     gap: 2px;
     padding: 16px 24px 28px;
-    background: rgba(4, 16, 30, 0.97);
+    background: rgba(var(--veil-rgb), 0.97);
     backdrop-filter: blur(16px);
     opacity: 0;
     transform: translateY(-14px);
