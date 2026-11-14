@@ -169,20 +169,6 @@ button {
   color: #fff;
 }
 
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  flex: 0 0 46px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
-  color: #241a06;
-  font-weight: 900;
-  font-size: 17px;
-  letter-spacing: 0.02em;
-}
-
 .brand-text {
   display: flex;
   flex-direction: column;
