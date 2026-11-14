@@ -724,10 +724,12 @@ button {
 }
 
 /* ---------- 14. 回到顶部 ---------- */
+/* 右下角是主题按钮（bottom 22 + 46 高，占到 68），回到顶部往上让一层，
+   两个圆之间留 16 的缝，不然会整个压在主题按钮上 */
 .to-top {
   position: fixed;
   right: 26px;
-  bottom: 26px;
+  bottom: 84px;
   z-index: 800;
   width: 46px;
   height: 46px;

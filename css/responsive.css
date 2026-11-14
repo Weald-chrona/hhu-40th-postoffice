@@ -199,9 +199,10 @@
     font-size: 22px;
   }
 
+  /* 窄屏主题按钮缩到 42、bottom 14（占到 56），这里跟着让到 70 */
   .to-top {
     right: 16px;
-    bottom: 16px;
+    bottom: 70px;
   }
 }
 
